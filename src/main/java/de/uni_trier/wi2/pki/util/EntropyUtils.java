@@ -31,17 +31,17 @@ public class EntropyUtils {
 
         double entropy = (-positive/(positive + negative) * log2(positive/(positive + negative))) -(negative/(positive + negative) * log2(negative/(positive + negative))); // H(E)
 
-        System.out.println(entropy);
+//        System.out.println(entropy);
 
-        // calculating entropy per interval
+        // calculating entropy per attribute
         for (int i = 0; i < matrix.size(); i++) {
             if(i != labelIndex){
-                HashMap<String, int[]> hashMap = new HashMap<>();
+                HashMap<String, double[]> hashMap = new HashMap<>();
                 CSVAttribute[] csvAttributes = matrix.get(i);
-
+                // counting positive and negative per interval
                 for (int j = 0; j < csvAttributes.length; j++) {
                     try{
-                        int[] counterArray = hashMap.get(csvAttributes[j].getCategory().toString());        // array counts class = 0 in position 0 and class = 1 in position 1; generic implementation requires hashmap
+                        double[] counterArray = hashMap.get(csvAttributes[j].getCategory().toString());        // array counts class = 0 in position 0 and class = 1 in position 1; generic implementation requires hashmap
                         if (exitedArray[j].getValue().toString().equals("0")){
                             counterArray[0]++;
                         }else{
@@ -51,33 +51,34 @@ public class EntropyUtils {
 
                     }catch (NullPointerException e){
                         if (exitedArray[j].getValue().toString().equals("0")){
-                            hashMap.put(csvAttributes[j].getCategory().toString(), new int[] {1, 0});
+                            hashMap.put(csvAttributes[j].getCategory().toString(), new double[] {1, 0});
                         }else{
-                            hashMap.put(csvAttributes[j].getCategory().toString(), new int[] {0, 1});
+                            hashMap.put(csvAttributes[j].getCategory().toString(), new double[] {0, 1});
                         }
                     }
                 }
 
-//                for (Map.Entry<String, int[]> entry : hashMap.entrySet()) {
-//                    int[] array = entry.getValue();
-//                    System.out.println(array[0] + " " + array[1]);
-//                    double intervalEntropy = (-array[1]/(array[1] + array[0]) * log2(array[1] / (array[1] + array[0]))) - (array[0]/(array[1] + array[0]) * log2(array[0] / (array[1] + array[0])));    // H(E i)
-//                    System.out.println(intervalEntropy);
-//                }
+                // calculating entropy per interval
+                double restEntropy = 0;
+                for (Map.Entry<String, double[]> entry: hashMap.entrySet()){
+                    double[] array = entry.getValue();
+                    double intervalEntropy = (-array[1]/(array[1] + array[0]) * log2(array[1]/(array[1] + array[0]))) -(array[0]/(array[1] + array[0]) * log2(array[0]/(array[1] + array[0]))); // H(E i)
+                    // calculating rest entropy R(A)
+                    restEntropy = restEntropy + (((array[1] + array[0])/ csvAttributes.length) * intervalEntropy);
 
-                hashMap.forEach((key, array) ->{
-                    double intervalEntropy = (-array[1]/(array[1] + array[0]) * log2(array[1]/(array[1] + array[0]))) -(array[0]/(array[1] + array[0]) * log2(array[0]/(array[1] + array[0]))); // H(E)
-//                    System.out.println(intervalEntropy);
-                });
+                }
 
+                // calculating gain
+                double gain = entropy - restEntropy;
+                System.out.println("Gain for Attribute is: " + gain);
 
-                System.out.println(hashMap.size());       // prints # of categories per attribute
+//                System.out.println(hashMap.size());       // prints # of categories per attribute
 
-                hashMap.forEach((k, v) ->{
-
-                    System.out.println(k + " " + v[0] +" "+ v[1]);
-                });
-                System.out.println("______________");
+//                hashMap.forEach((k, v) ->{
+//
+//                    System.out.println(k + " " + v[0] +" "+ v[1]);
+//                });
+//                System.out.println("______________");
             }
         }
 
