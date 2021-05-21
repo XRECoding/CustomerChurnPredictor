@@ -18,7 +18,7 @@ public class EntropyUtils {
      * @return the information gain for each attribute
      */
     public static List<Double> calcInformationGain(LinkedList<CSVAttribute[]> matrix, int labelIndex) {     // changed Collection to LinkedList
-
+        List<Double> output = new LinkedList<>();
         CSVAttribute[] exitedArray = matrix.get(labelIndex);
 
         double positive = 0;
@@ -70,19 +70,12 @@ public class EntropyUtils {
 
                 // calculating gain
                 double gain = entropy - restEntropy;
-                System.out.println("Gain for Attribute is: " + gain);
-
-//                System.out.println(hashMap.size());       // prints # of categories per attribute
-
-//                hashMap.forEach((k, v) ->{
-//
-//                    System.out.println(k + " " + v[0] +" "+ v[1]);
-//                });
-//                System.out.println("______________");
+//                System.out.println("Gain for Attribute is: " + gain);
+                output.add(gain);
             }
         }
 
-        return null;
+        return output;
     }
 
     public static double log2(double value){
