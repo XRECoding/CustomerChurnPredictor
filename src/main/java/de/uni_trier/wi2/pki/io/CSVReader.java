@@ -20,18 +20,16 @@ public class CSVReader {
      * @return A list that contains string arrays. Each string array stands for one parsed line of the CSV file
      * @throws IOException if something goes wrong. Exception should be handled at the calling function.
      */
+    
     public static List<String[]> readCsvToArray(String relativePath, String delimiter, boolean ignoreHeader) throws IOException {
-
         List<String[]> output = new LinkedList<String[]>();
+        FileReader file = new FileReader("src/main/resources/" + relativePath); 
 
-        try(BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/"+relativePath))){    // subject to change; specification of relativePath needed
-            String[] input;
+        try (BufferedReader bufferedReader = new BufferedReader(file)) {    // subject to change; specification of relativePath needed
             String currentLine;
 
-            while ((currentLine = bufferedReader.readLine()) != null){
-                input = currentLine.split(delimiter);
-                output.add(input);
-            }
+            while ((currentLine = bufferedReader.readLine()) != null)
+                output.add(currentLine.split(delimiter));
         }
         
         return (ignoreHeader)? output.subList(1, output.size()) : output;
