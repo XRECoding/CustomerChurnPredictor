@@ -1,7 +1,6 @@
 package de.uni_trier.wi2.pki.io.attr;
 
-public class Continuously implements CSVAttribute{
-
+public class Continuously implements CSVAttribute {
     private Object value;
     private int category;
 
@@ -39,13 +38,6 @@ public class Continuously implements CSVAttribute{
         double ownValue = Double.parseDouble(value.toString());
         double oValue = Double.parseDouble((((Continuously) o).getValue()).toString());
 
-        if(ownValue < oValue){
-            return 1;
-        }else if(ownValue > oValue){
-            return -1;
-        }else{
-            return 0;
-        }
+        return (ownValue < oValue)? 1 : (ownValue > oValue)? -1 : 0;
     }
-
 }
