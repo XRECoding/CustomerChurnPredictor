@@ -9,9 +9,9 @@ public class DecisionTreeNode {                     // Class for representing a 
     HashMap<String, DecisionTreeNode> splits;       // The checked split condition values and the nodes for these conditions.
 
     
-    public DecisionTreeNode(DecisionTreeNode parten, int index) {
+    public DecisionTreeNode(DecisionTreeNode parent, int index) {
         this.attributeIndex = index;
-        this.parent = parten;
+        this.parent = parent;
         splits = new HashMap<>();
     }
 
