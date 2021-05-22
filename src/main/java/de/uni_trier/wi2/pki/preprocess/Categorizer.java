@@ -3,108 +3,88 @@ package de.uni_trier.wi2.pki.preprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.Categoric;
 import de.uni_trier.wi2.pki.io.attr.Continuously;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Categorizer {
 
     public static LinkedList<CSVAttribute[]> categorize(List<String[]> linkedList){
+        long start = System.currentTimeMillis();
+        System.out.println("Anfang: " + 0);
 
-        LinkedList<CSVAttribute[]> output = new LinkedList<>();
+        LinkedList<CSVAttribute[]> output = new LinkedList<>();     // output list
 
-        Continuously[] creditScore = new Continuously[linkedList.size()];
-        Categoric[] geography = new Categoric[linkedList.size()];
-        Categoric[] gender = new Categoric[linkedList.size()];
-        Continuously[] age = new Continuously[linkedList.size()];
-        Continuously[] tenure = new Continuously[linkedList.size()];
-        Continuously[] balance = new Continuously[linkedList.size()];
-        Continuously[] numOfProducts = new Continuously[linkedList.size()];
-        Categoric[] hasCrCard = new Categoric[linkedList.size()];
-        Categoric[] isActiveMember = new Categoric[linkedList.size()];
-        Continuously[] estimatedSalary = new Continuously[linkedList.size()];
-        Categoric[] exited = new Categoric[linkedList.size()];
+        // making a hashmap for every column of the dataset
+        Map<String,Integer>[] mapArray = new HashMap[linkedList.get(0).length];
 
-        output.add(creditScore);
-        output.add(geography);
-        output.add(gender);
-        output.add(age);
-        output.add(tenure);
-        output.add(balance);
-        output.add(numOfProducts);
-        output.add(hasCrCard);
-        output.add(isActiveMember);
-        output.add(estimatedSalary);
-        output.add(exited);
-
-        int counter = 0;
-        for (String[] variable : linkedList) {
-            creditScore[counter] = new Continuously(variable[0]);
-            geography[counter] = new Categoric(variable[1]);
-            gender[counter] = new Categoric(variable[2]);
-            age[counter] = new Continuously(variable[3]);
-            tenure[counter] = new Continuously(variable[4]);
-            balance[counter] = new Continuously(variable[5]);
-            numOfProducts[counter] = new Continuously(variable[6]);
-            hasCrCard[counter] = new Categoric(variable[7]);
-            isActiveMember[counter] = new Categoric(variable[8]);
-            estimatedSalary[counter] = new Continuously(variable[9]);
-            exited[counter] = new Categoric(variable[10]);
-            counter++;
+        for (int n = 0; n < mapArray.length; n++){
+            mapArray[n] = new HashMap<String,Integer>();
         }
 
 
-        Map<String,Integer>[] map = new HashMap[linkedList.get(0).length];
-        for (int n = 0; n < map.length; n++) {
-            map[n] = new HashMap<String,Integer>();
-        }
-
-        for (int j = 0; j < linkedList.size(); j++) {
-            String[] r = linkedList.get(j);
-            for (int i = 0; i < r.length; i++) {
-                if(map[i].get(r[i]) == null)
-                    map[i].put(r[i], 1);
-                else
-                    map[i].put(r[i], map[i].get(r[i])+1);
+        // count unique values for each column (for isCategoric check)
+        for (String[] element : linkedList){
+            for (int i = 0; i < element.length; i++){
+                if (mapArray[i].get(element[i]) == null){
+                    mapArray[i].put(element[i], 1);
+                }else{
+                    mapArray[i].put(element[i], mapArray[i].get(element[i])+1);
+                }
             }
         }
 
+        long stop1 = System.currentTimeMillis();
+        long ausgabe = stop1 - start;
+        System.out.println("Unique values have been counted in " + ausgabe + " milliseconds");
 
-        // for check Method
-        Map<String,String>[] map2 = new HashMap[13];
-        for (int n = 0; n < map.length; n++) {
-            map2[n] = new HashMap<String,String>();
-        }
-        for (int i = 0; i < linkedList.size(); i++) {
-            String[] r = linkedList.get(i);
-            for (int j = 0; j < r.length; j++) {
-                map2[j].put(r[j], r[j]);
-            }
+        // check if column is categoric and create Attributes respectively
+//        for (int i = 0; i < mapArray.length; i++) {
+//            CSVAttribute[] array = new CSVAttribute[linkedList.size()];     // represents column
+//            int index = 0;
+//            if (isCategoric(mapArray[i])){
+//                for (int j = 0; j < linkedList.size(); j++) {
+//                    array[index] = new Categoric(linkedList.get(j)[i]);
+//                    index++;
+//                }
+//            }else{
+//                for (int j = 0; j < linkedList.size(); j++) {
+//                    array[index] = new Continuously(linkedList.get(j)[i]);
+//                    index++;
+//                }
+//            }
+//
+//            output.add(array);
+//        }
+
+        AtomicInteger i = new AtomicInteger(0);
+        for (; i.intValue() < mapArray.length; i.incrementAndGet()) {
+            CSVAttribute[] array = new CSVAttribute[linkedList.size()];
+            AtomicInteger index = new AtomicInteger(0);
+
+            if (isCategoric(mapArray[i.intValue()]))
+                linkedList.stream().forEach(x -> {array[index.incrementAndGet()-1] = new Categoric(x[i.intValue()]);});
+            else
+                linkedList.stream().forEach(x -> {array[index.incrementAndGet()-1] = new Continuously(x[i.intValue()]);});
+
+            output.add(array);
         }
 
-        for (int i = 0; i < 11; i++)
-            System.out.println("Attribut " + (i + 1) + ": " + (check(map2[i])?"kategorisch":"kontinuierlich"));
-//            System.out.println("Attribut " + (i + 1) + ": " + (hello(map[i])?"kategorisch":"kontinuierlich"));
+        long stop2 = System.currentTimeMillis();
+        ausgabe = stop2 - stop1;
+        System.out.println("Nested for-loop done in " + ausgabe + " milliseconds");
 
         return output;
     }
 
-    public static Boolean hello (Map<String, Integer> map) {
-        try {
-            Double value = map.entrySet().stream().filter(x -> (Integer) x.getValue() / Double.valueOf(9763) < 0.02)
-                    .mapToDouble(x -> (Integer) x.getValue() / Double.valueOf(9763)).average().getAsDouble();
-            return value < 0.02;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
-    public static boolean check(Map<String, String> map) {
+    // checks if the column is categoric
+    public static boolean isCategoric(Map<String, Integer> map) {
         try {
-            for (Map.Entry<String, String> element : map.entrySet()) {
-                Double.parseDouble(element.getValue().toString());
+            for (Map.Entry<String, Integer> element : map.entrySet()) {
+                Double.parseDouble(element.getKey());
                 break;
             }
         } catch (Exception e) {
