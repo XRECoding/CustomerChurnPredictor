@@ -6,6 +6,8 @@ import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utility class for creating a decision tree with the ID3 algorithm.
@@ -28,13 +30,13 @@ public class ID3Utils {
         double maxGain = entropyList.get(0);
         int attributeIndex = 0;
 
-        System.out.println("\n" + examples.size());
+       
 
         for (int i = 1; i < entropyList.size(); i++) {
             System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
             if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
         }
-
+   
         examples.remove(attributeIndex);
         System.out.println("\nIndex: " + attributeIndex + " Value: " + entropyList.get(attributeIndex)*100);
         System.out.println(examples.size());
