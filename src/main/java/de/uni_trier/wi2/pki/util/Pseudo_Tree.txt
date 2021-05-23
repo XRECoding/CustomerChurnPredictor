@@ -10,12 +10,13 @@ def createTree(examples, labelIndex)
     od
 
     currLabel = examples.removeAndGet(maxIndex);
-    currNode = new TreeNode(null, "index")
+    currNode = new TreeNode(null, )
 
     for (bucket e currLabel) 
         child = new TreeNode(createTree(examples, labelIndex-1), maxIndex);
         bucket.getMap().set("String", child);
     od
-
+    
+    createTree(null; 0;)
     
     return currNode;
