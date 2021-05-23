@@ -20,17 +20,28 @@ public class ID3Utils {
      * @return The root node of the decision tree
      */
     public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
+        if (examples.size() == 1) return null;                          // Rekursionsanker
+
         LinkedList<Double> entropyList = (LinkedList<Double>) EntropyUtils.calcInformationGain(examples, labelIndex);
 
         // find attribute with best entropy gain
         double maxGain = entropyList.get(0);
         int attributeIndex = 0;
+
+        System.out.println("\n" + examples.size());
+
         for (int i = 1; i < entropyList.size(); i++) {
-            if (entropyList.get(i) > maxGain) maxGain = entropyList.get(i); attributeIndex = i;
+            System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
+            if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
         }
 
+        examples.remove(attributeIndex);
+        System.out.println("\nIndex: " + attributeIndex + " Value: " + entropyList.get(attributeIndex)*100);
+        System.out.println(examples.size());
+
+
         // create tree node for attribute with best entropy
-        DecisionTreeNode root = new DecisionTreeNode(null, attributeIndex);
+        DecisionTreeNode root = new DecisionTreeNode(createTree(examples, labelIndex-1), attributeIndex);
 
 
 

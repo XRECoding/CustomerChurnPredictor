@@ -1,0 +1,21 @@
+def createTree(examples, labelIndex) 
+    if (examples.size = 1) return null;                 // Anker der das Blatt zurück gibt.
+
+    entroList = Gain(examples, labelIndex);
+    maxIndex  = 0
+
+    for (i = 0; i < examples.size; i++) do
+        if (entroList.get(i) > entroList.get(maxIndex)) then
+            maxIndex = i; fi
+    od
+
+    currLabel = examples.removeAndGet(maxIndex);
+    currNode = new TreeNode(null, "index")
+
+    for (bucket e currLabel) 
+        child = new TreeNode(createTree(examples, labelIndex-1), maxIndex);
+        bucket.getMap().set("String", child);
+    od
+
+    
+    return currNode;
