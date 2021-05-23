@@ -1,22 +1,23 @@
 def createTree(examples, labelIndex) 
     if (examples.size = 1) return null;                 // Anker der das Blatt zurück gibt.
 
-    entroList = Gain(examples, labelIndex);
-    maxIndex  = 0
+    entroList = Gain(examples, labelIndex);             // Generiere die Liste der Entropys
+    maxIndex  = 0                                       // Verweis auf das Attribut mit dem höchsten gain
 
-    for (i = 0; i < examples.size; i++) do
-        if (entroList.get(i) > entroList.get(maxIndex)) then
-            maxIndex = i; fi
+    for (i = 0; i < examples.size; i++) do                      // Suche das Attribut mit dem höchsten gain
+        if (entroList.get(i) > entroList.get(maxIndex)) then    // Gibt es ein Attribut mit einem höheren gain,
+            maxIndex = i; fi                                    // dann bewege den Verweis
     od
 
-    currLabel = examples.removeAndGet(maxIndex);
-    currNode = new TreeNode(null, )
+    currLabel = examples.getAndRemove(maxIndex);        // Pop das Arrays mit dem maxIndex aus examples
+    curNode = new Node(null, "index")                   // Erstelle einen neuen Knotenpunkt
 
-    for (bucket e currLabel) 
-        child = new TreeNode(createTree(examples, labelIndex-1), maxIndex);
-        bucket.getMap().set("String", child);
+    for (bucket e currLabel)                                                    // Generiere soviele Kinder wie es Buckets gibt
+        child = new TreeNode(createTree(examples, labelIndex-1), maxIndex);     // Rekursivers generieren der Kinder
+        curNode.getMap().set(bucket, child);                                    // Befüllung der Map mit Kindern
     od
-    
-    createTree(null; 0;)
-    
-    return currNode;
+
+    for (child e curNode) do                            // Rufe alle Kinder auf 
+        child.setParent = curNode;                      // und setze die Verweis auf den Vaterknoten
+
+    return currNode;                                    // Wiedergabe des momentanen Knotenpunktes

@@ -3,6 +3,7 @@ package de.uni_trier.wi2.pki.util;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +34,8 @@ public class ID3Utils {
        
 
         for (int i = 1; i < entropyList.size(); i++) {
-            System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
+            //System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
+            //System.out.println("Index: " + i + " Max: " + examples.get(i).length);
             if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
         }
    

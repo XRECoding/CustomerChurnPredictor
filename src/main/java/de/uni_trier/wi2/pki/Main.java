@@ -3,6 +3,8 @@ package de.uni_trier.wi2.pki;
 import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
+import de.uni_trier.wi2.pki.util.ID3Utils;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +19,8 @@ public class Main {
             List<String[]> linkedList = CSVReader.readCsvToArray("churn_data.csv", ";", true);
             // categorizing input data into CSVAttributes
             LinkedList<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
+
+            ID3Utils.createTree(newList, 10);
 
 
 
