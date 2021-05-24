@@ -4,6 +4,8 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.Continuously;
 import java.util.LinkedList;
 
+@SuppressWarnings("rawtypes")
+
 /**
  * Class that holds logic for discretizing values.
  */
@@ -18,14 +20,12 @@ public class BinningDiscretizer {
      * @return the list of discretized examples.
      */
     public static LinkedList<CSVAttribute[]> discretize(int numberOfBins, LinkedList<CSVAttribute[]> examples, int attributeId) {
-
         CSVAttribute[] array = examples.get(attributeId);
         CSVAttribute min = array[0];
         CSVAttribute max = array[0];
 
         // Looping through the attribute that should be discretized, finding min and max
         for (int i = 1; i < array.length; i++) {
-
             min = (min.compareTo(array[i]) == -1)? array[i] : min;
             max = (max.compareTo(array[i]) == 1)? array[i] : max;
         }
@@ -46,5 +46,4 @@ public class BinningDiscretizer {
 
         return examples;
     }
-
 }

@@ -64,16 +64,17 @@ public class Categorizer {
             CSVAttribute[] array = new CSVAttribute[linkedList.size()];
             AtomicInteger index = new AtomicInteger(0);
 
-            if (isCategoric(mapArray[i.intValue()])){
-                linkedList.stream().forEach(x -> {array[index.incrementAndGet()-1] = new Categoric(x[i.intValue()]);});
+            if (isCategoric(mapArray[i.intValue()])) {
+                linkedList.stream().forEach(x -> array[index.incrementAndGet()-1] = new Categoric(x[i.intValue()]));
                 output.add(array);
-            }else{
-                linkedList.stream().forEach(x -> {array[index.incrementAndGet()-1] = new Continuously(x[i.intValue()]);});
+            } else {
+                linkedList.stream().forEach(x -> array[index.incrementAndGet()-1] = new Continuously(x[i.intValue()]));
                 output.add(array);
                 // column is continuously and has to be discretized
                 BinningDiscretizer.discretize(5, output, output.size()-1);      // TODO number of bins is hardcoded to 5
             }
         }
+
 
 //        long stop2 = System.currentTimeMillis();
 //        ausgabe = stop2 - stop1;
@@ -86,10 +87,7 @@ public class Categorizer {
     // checks if the column is categoric
     public static boolean isCategoric(Map<String, Integer> map) {
         try {
-            for (Map.Entry<String, Integer> element : map.entrySet()) {
-                Double.parseDouble(element.getKey());
-                break;
-            }
+            Double.parseDouble(map.entrySet().iterator().next().getKey());
         } catch (Exception e) {
             return true;
         }

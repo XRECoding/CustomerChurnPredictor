@@ -2,7 +2,6 @@ package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-
 import java.util.*;
 
 /**
@@ -18,21 +17,31 @@ public class ID3Utils {
      * @return The root node of the decision tree
      */
     public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
+        if (examples.size() == 1) return null;                          // Rekursionsanker
+
         // calculate entropy gain for all attributes
         LinkedList<Double> entropyList = (LinkedList<Double>) EntropyUtils.calcInformationGain(examples, labelIndex);
 
         // find attribute with best entropy gain
         double maxGain = entropyList.get(0);
         int attributeIndex = 0;
-        for (int i = 1; i < entropyList.size(); i++) {
-            if (entropyList.get(i) > maxGain){
-                maxGain = entropyList.get(i);
-                attributeIndex = i;
-            }
-        }
 
-        // create tree node for attribute with best entropy gain
-        DecisionTreeNode root = new DecisionTreeNode(null, attributeIndex);
+       
+
+        for (int i = 1; i < entropyList.size(); i++) {
+            //System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
+            //System.out.println("Index: " + i + " Max: " + examples.get(i).length);
+            if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
+
+        }
+   
+        examples.remove(attributeIndex);
+        System.out.println("\nIndex: " + attributeIndex + " Value: " + entropyList.get(attributeIndex)*100);
+        System.out.println(examples.size());
+
+      
+        
+
 
         // finding all unique values of attribute with best entropy gain
         HashMap<String, String> uniqueValues = new HashMap<>();
@@ -41,7 +50,7 @@ public class ID3Utils {
             uniqueValues.put(examples.get(attributeIndex)[i].getCategory().toString(), "mir egal");
         }
 
-
+        DecisionTreeNode root = new DecisionTreeNode(createTree(examples, labelIndex-1), attributeIndex);
 
         // test prints
         for (int i = 0; i < entropyList.size(); i++) {
