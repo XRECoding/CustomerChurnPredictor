@@ -1,10 +1,14 @@
+//////////////////////////////////////////////////////////////
+// Veraltet und kann somit nicht mehr zu 100% relevant sein //
+//////////////////////////////////////////////////////////////
+
 def createTree(examples, labelIndex) 
     if (examples.size = 1) return null;                 // Anker der das Blatt zurück gibt.
 
     entroList = Gain(examples, labelIndex);             // Generiere die Liste der Entropys
     maxIndex  = 0                                       // Verweis auf das Attribut mit dem höchsten gain
 
-    for (i = 0; i < examples.size; i++) do                      // Suche das Attribut mit dem höchsten gain
+    for (i = 1; i < examples.size; i++) do                      // Suche das Attribut mit dem höchsten gain
         if (entroList.get(i) > entroList.get(maxIndex)) then    // Gibt es ein Attribut mit einem höheren gain,
             maxIndex = i; fi                                    // dann bewege den Verweis
     od
@@ -12,12 +16,10 @@ def createTree(examples, labelIndex)
     currLabel = examples.getAndRemove(maxIndex);        // Pop das Arrays mit dem maxIndex aus examples
     curNode = new Node(null, "index")                   // Erstelle einen neuen Knotenpunkt
 
-    for (bucket e currLabel)                                                    // Generiere soviele Kinder wie es Buckets gibt
-        child = new TreeNode(createTree(examples, labelIndex-1), maxIndex);     // Rekursivers generieren der Kinder
-        curNode.getMap().set(bucket, child);                                    // Befüllung der Map mit Kindern
-    od
-
-    for (child e curNode) do                            // Rufe alle Kinder auf 
-        child.setParent = curNode;                      // und setze die Verweis auf den Vaterknoten
+    for (bucket e currLabel)                            // Generiere soviele Kinder wie es Buckets gibt
+        child = createTree(examples, labelIndex-1);     // Rekursivers generieren der Kinder
+        child.setParent = curNode;                      // Setze Verweis auf den Vaterknoten
+        curNode.getMap().set(bucket, child);            // Befüllung der Map mit Kindern
+    od  
 
     return currNode;                                    // Wiedergabe des momentanen Knotenpunktes
