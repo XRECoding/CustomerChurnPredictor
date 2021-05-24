@@ -2,9 +2,10 @@ package de.uni_trier.wi2.pki.postprocess;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-
 import java.util.List;
 import java.util.function.BiFunction;
+
+@SuppressWarnings("rawtypes")
 
 /**
  * Contains util methods for performing a cross-validation.

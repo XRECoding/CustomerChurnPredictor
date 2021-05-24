@@ -3,6 +3,8 @@ package de.uni_trier.wi2.pki.util;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import java.util.*;
 
+@SuppressWarnings("rawtypes")
+
 /**
  * Contains methods that help with computing the entropy.
  */

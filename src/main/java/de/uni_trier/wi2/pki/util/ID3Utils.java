@@ -4,6 +4,8 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.*;
 
+@SuppressWarnings("rawtypes")
+
 /**
  * Utility class for creating a decision tree with the ID3 algorithm.
  */

@@ -2,8 +2,9 @@ package de.uni_trier.wi2.pki.postprocess;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-
 import java.util.Collection;
+
+@SuppressWarnings("rawtypes")
 
 /**
  * Prunes a trained decision tree in a post-pruning way.

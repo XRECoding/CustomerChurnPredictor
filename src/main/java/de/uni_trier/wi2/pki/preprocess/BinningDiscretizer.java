@@ -4,7 +4,7 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.Continuously;
 import java.util.LinkedList;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 
 /**
  * Class that holds logic for discretizing values.
