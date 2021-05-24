@@ -29,6 +29,8 @@ public class Main {
 //                System.out.println(array[9762].getValue());
 //            }
 
+            ID3Utils.createTree(newList, 10);
+
 
         }catch (IOException e){
             System.out.println(e.getStackTrace());

@@ -2,13 +2,7 @@ package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * Utility class for creating a decision tree with the ID3 algorithm.
@@ -25,6 +19,7 @@ public class ID3Utils {
     public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
         if (examples.size() == 1) return null;                          // Rekursionsanker
 
+        // calculate entropy gain for all attributes
         LinkedList<Double> entropyList = (LinkedList<Double>) EntropyUtils.calcInformationGain(examples, labelIndex);
 
         // find attribute with best entropy gain
@@ -37,16 +32,35 @@ public class ID3Utils {
             //System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
             //System.out.println("Index: " + i + " Max: " + examples.get(i).length);
             if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
+
         }
    
         examples.remove(attributeIndex);
         System.out.println("\nIndex: " + attributeIndex + " Value: " + entropyList.get(attributeIndex)*100);
         System.out.println(examples.size());
 
+      
+        
 
-        // create tree node for attribute with best entropy
+
+        // finding all unique values of attribute with best entropy gain
+        HashMap<String, String> uniqueValues = new HashMap<>();
+
+        for (int i = 0; i < examples.get(attributeIndex).length; i++) {
+            uniqueValues.put(examples.get(attributeIndex)[i].getCategory().toString(), "mir egal");
+        }
+
         DecisionTreeNode root = new DecisionTreeNode(createTree(examples, labelIndex-1), attributeIndex);
 
+        // test prints
+        for (int i = 0; i < entropyList.size(); i++) {
+            System.out.println("Attribute with index " + i + " has entryop gain: " + entropyList.get(i));
+        }
+
+        System.out.println("\nattribute with index " + attributeIndex);
+        for (Map.Entry<String, String> entry : uniqueValues.entrySet()) {
+            System.out.println(entry.getKey());
+        }
 
 
 

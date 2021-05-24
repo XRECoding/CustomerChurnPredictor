@@ -75,13 +75,6 @@ public class Categorizer {
             }
         }
 
-        CSVAttribute[] test = output.get(0);
-        for (int j = 0; j < 100; j++) {
-            Continuously asd = (Continuously) test[j];
-            //System.out.println(asd.getCategory());
-        }
-
-
 
 //        long stop2 = System.currentTimeMillis();
 //        ausgabe = stop2 - stop1;
