@@ -83,3 +83,6 @@ public class EntropyUtils {
         return (Math.log(value) / Math.log(2));
     }
 }
+
+
+// TODO Algorithms is not able to work with "divide by zero". ~> Unsure if the Algorithm knows what to do when multiplying by zero
