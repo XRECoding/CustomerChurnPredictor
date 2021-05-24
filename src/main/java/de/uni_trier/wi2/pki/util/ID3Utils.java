@@ -26,22 +26,11 @@ public class ID3Utils {
         double maxGain = entropyList.get(0);
         int attributeIndex = 0;
 
-       
-
         for (int i = 1; i < entropyList.size(); i++) {
-            //System.out.println("Index: " + i + " Value: " + entropyList.get(i)*100);
-            //System.out.println("Index: " + i + " Max: " + examples.get(i).length);
             if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
-
         }
    
         examples.remove(attributeIndex);
-        System.out.println("\nIndex: " + attributeIndex + " Value: " + entropyList.get(attributeIndex)*100);
-        System.out.println(examples.size());
-
-      
-        
-
 
         // finding all unique values of attribute with best entropy gain
         HashMap<String, String> uniqueValues = new HashMap<>();
@@ -50,17 +39,9 @@ public class ID3Utils {
             uniqueValues.put(examples.get(attributeIndex)[i].getCategory().toString(), "mir egal");
         }
 
+        // create node for best attribute
         DecisionTreeNode root = new DecisionTreeNode(createTree(examples, labelIndex-1), attributeIndex);
 
-        // test prints
-        for (int i = 0; i < entropyList.size(); i++) {
-            System.out.println("Attribute with index " + i + " has entryop gain: " + entropyList.get(i));
-        }
-
-        System.out.println("\nattribute with index " + attributeIndex);
-        for (Map.Entry<String, String> entry : uniqueValues.entrySet()) {
-            System.out.println(entry.getKey());
-        }
 
 
 
@@ -74,9 +55,6 @@ public class ID3Utils {
                 5a. create treeNode
                 5b. examples = examples - attribute used
                 5c. createTree(examples, labelIndex -1)
-
-            - Add global array which saves the # of categories per attribute
-            - when reading / counting
          */
 
         return root;

@@ -12,9 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Categorizer {
 
     public static LinkedList<CSVAttribute[]> categorize(List<String[]> linkedList){
-//        long start = System.currentTimeMillis();
-//        System.out.println("Anfang: " + 0);
-
         LinkedList<CSVAttribute[]> output = new LinkedList<>();     // output list
 
         // making a hashmap for every column of the dataset
@@ -36,29 +33,7 @@ public class Categorizer {
             }
         }
 
-//        long stop1 = System.currentTimeMillis();
-//        long ausgabe = stop1 - start;
-//        System.out.println("Unique values have been counted in " + ausgabe + " milliseconds");
-
-        // check if column is categoric and create Attributes respectively
-//        for (int i = 0; i < mapArray.length; i++) {
-//            CSVAttribute[] array = new CSVAttribute[linkedList.size()];     // represents column
-//            int index = 0;
-//            if (isCategoric(mapArray[i])){
-//                for (int j = 0; j < linkedList.size(); j++) {
-//                    array[index] = new Categoric(linkedList.get(j)[i]);
-//                    index++;
-//                }
-//            }else{
-//                for (int j = 0; j < linkedList.size(); j++) {
-//                    array[index] = new Continuously(linkedList.get(j)[i]);
-//                    index++;
-//                }
-//            }
-//
-//            output.add(array);
-//        }
-
+        // checking each column for categoric / continuously
         AtomicInteger i = new AtomicInteger(0);
         for (; i.intValue() < mapArray.length; i.incrementAndGet()) {
             CSVAttribute[] array = new CSVAttribute[linkedList.size()];
@@ -75,10 +50,6 @@ public class Categorizer {
             }
         }
 
-
-//        long stop2 = System.currentTimeMillis();
-//        ausgabe = stop2 - stop1;
-//        System.out.println("Nested for-loop done in " + ausgabe + " milliseconds");
 
         return output;
     }
