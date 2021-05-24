@@ -1,8 +1,11 @@
 package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
+import de.uni_trier.wi2.pki.io.attr.Continuously;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("rawtypes")
 
@@ -18,34 +21,42 @@ public class ID3Utils {
      * @param labelIndex The label of the attribute that should be used as an index.
      * @return The root node of the decision tree
      */
-    public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
+    public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex, int a) {        // changed collection to linked list
         if (examples.size() == 1) return null;                          // Rekursionsanker
 
-        // calculate entropy gain for all attributes
-        LinkedList<Double> entropyList = (LinkedList<Double>) EntropyUtils.calcInformationGain(examples, labelIndex);
-
-        // find attribute with best entropy gain
-        double maxGain = entropyList.get(0);
+        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);          // calculate entropy gain for all attributes
         int attributeIndex = 0;
 
-        for (int i = 1; i < entropyList.size(); i++) {
-            if (entropyList.get(i) > maxGain) { maxGain = entropyList.get(i); attributeIndex = i; }
-        }
-   
+        for (int i = 1; i < entropyList.size(); i++) 
+            if (entropyList.get(i) > entropyList.get(attributeIndex))
+                attributeIndex = i; 
+
+        DecisionTreeNode curNode = new DecisionTreeNode(1);           // TODO set Index
+        int numBuckets = getBuckets(examples.get(attributeIndex));
+
         examples.remove(attributeIndex);
 
-        // finding all unique values of attribute with best entropy gain
-        HashMap<String, String> uniqueValues = new HashMap<>();
-
-        for (int i = 0; i < examples.get(attributeIndex).length; i++) {
-            uniqueValues.put(examples.get(attributeIndex)[i].getCategory().toString(), "mir egal");
+        System.out.println("Start");
+        for (int i = 0; i < numBuckets; i++) {
+            LinkedList<CSVAttribute[]> clonedList = (LinkedList<CSVAttribute[]>) examples.clone();
+            System.out.println("~~> " + i + " child: " + labelIndex + " parent: " + a);
+            DecisionTreeNode child = createTree(clonedList, labelIndex-1, a + 1);
+            if (child == null) continue;
+            child.setParent(curNode);
+            curNode.splits.put(String.valueOf(i), child);                 // TODO Key Index
         }
 
-        // create node for best attribute
-        DecisionTreeNode root = new DecisionTreeNode(createTree(examples, labelIndex-1), attributeIndex);
+        System.out.println("ENDE\n");
+        return curNode;
+    }
 
-
-
+    // finding all unique values of attribute with best entropy gain
+    public static int getBuckets(CSVAttribute[] array) { 
+        return (array[0] instanceof Continuously)? 
+        Stream.of(array).collect(Collectors.toMap(CSVAttribute::getCategory, p -> p, (p, q) -> p)).values().size():                                     // TODO return number of bins is hardcoded to 5
+        Stream.of(array).collect(Collectors.toMap(CSVAttribute::getValue, p -> p, (p, q) -> p)).values().size();
+    } 
+}
 
         /* TODO
             1. calculate entropy
@@ -58,8 +69,3 @@ public class ID3Utils {
                 5b. examples = examples - attribute used
                 5c. createTree(examples, labelIndex -1)
          */
-
-        return root;
-    }
-
-}
