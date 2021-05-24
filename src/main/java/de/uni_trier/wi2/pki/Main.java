@@ -3,6 +3,9 @@ package de.uni_trier.wi2.pki;
 import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
+import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+import de.uni_trier.wi2.pki.util.ID3Utils;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +27,8 @@ public class Main {
 //            for (CSVAttribute[] array : newList) {
 //                System.out.println(array[9762].getValue());
 //            }
+
+            ID3Utils.createTree(newList, 10);
 
 
         }catch (IOException e){
