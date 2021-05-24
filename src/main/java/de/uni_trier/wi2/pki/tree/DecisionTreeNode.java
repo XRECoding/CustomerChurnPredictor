@@ -6,13 +6,16 @@ import java.util.HashMap;
 public class DecisionTreeNode {                     // Class for representing a node in the decision tree.
     protected DecisionTreeNode parent;              // The parent node in the decision tree.
     protected int attributeIndex;                   // The attribute index to check.
-    HashMap<String, DecisionTreeNode> splits;       // The checked split condition values and the nodes for these conditions.
+    public HashMap<String, DecisionTreeNode> splits;       // The checked split condition values and the nodes for these conditions.
 
     
-    public DecisionTreeNode(DecisionTreeNode parent, int index) {
+    public DecisionTreeNode(int index) {
         this.attributeIndex = index;
-        this.parent = parent;
         splits = new HashMap<>();
+    }
+
+    public void setParent(DecisionTreeNode parent) {
+        this.parent = parent;
     }
 
     public int getAttributeIndex() {
