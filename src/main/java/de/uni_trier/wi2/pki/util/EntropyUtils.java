@@ -3,6 +3,8 @@ package de.uni_trier.wi2.pki.util;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import java.util.*;
 
+@SuppressWarnings("rawtypes")
+
 /**
  * Contains methods that help with computing the entropy.
  */
@@ -81,3 +83,6 @@ public class EntropyUtils {
         return (Math.log(value) / Math.log(2));
     }
 }
+
+
+// TODO Algorithms is not able to work with "divide by zero". ~> Unsure if the Algorithm knows what to do when multiplying by zero

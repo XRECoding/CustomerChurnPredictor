@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
+
 public class Categorizer {
 
     public static LinkedList<CSVAttribute[]> categorize(List<String[]> linkedList){

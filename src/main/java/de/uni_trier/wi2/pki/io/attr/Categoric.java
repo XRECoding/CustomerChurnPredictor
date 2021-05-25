@@ -1,5 +1,7 @@
 package de.uni_trier.wi2.pki.io.attr;
 
+@SuppressWarnings("rawtypes")
+
 public class Categoric implements CSVAttribute{
 
     private Object value;
