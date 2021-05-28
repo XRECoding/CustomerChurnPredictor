@@ -59,6 +59,11 @@ public class EntropyUtils {
                     }
                 }
 
+//                System.out.println("Attribute: " + i);
+//                for (Map.Entry<String, double[]> entry : hashMap.entrySet()){
+//                    System.out.println("Interval: " + entry.getKey() + " has " + entry.getValue()[0] + " negative and " + entry.getValue()[1] +" positive");
+//                }
+
                 // calculating entropy per interval
                 double restEntropy = 0;
                 for (Map.Entry<String, double[]> entry: hashMap.entrySet()){
@@ -66,7 +71,6 @@ public class EntropyUtils {
                     double intervalEntropy = (-array[1]/(array[1] + array[0]) * log2(array[1]/(array[1] + array[0]))) -(array[0]/(array[1] + array[0]) * log2(array[0]/(array[1] + array[0]))); // H(E i)
                     // calculating rest entropy R(A)
                     restEntropy = restEntropy + (((array[1] + array[0])/ csvAttributes.length) * intervalEntropy);
-
                 }
 
                 // calculating gain
