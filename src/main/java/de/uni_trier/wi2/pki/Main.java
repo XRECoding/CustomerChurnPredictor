@@ -4,12 +4,15 @@ import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.preprocess.BinningDiscretizer;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
+import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import de.uni_trier.wi2.pki.util.ID3Utils;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @SuppressWarnings("rawtypes")
 
@@ -24,8 +27,11 @@ public class Main {
             
             // categorizing input data into CSVAttributes
             List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
+            DecisionTreeNode root =  ID3Utils.createTree(newList, 10);
+            DFS(root);
+            
 
-            newList.stream().toList();
+
 
 
             //BinningDiscretizer.discretize(numberOfBins, examples, attributeId)
@@ -49,4 +55,10 @@ public class Main {
 
     }
 
+    public static void DFS(DecisionTreeNode node) {
+        if (node == null) return;
+
+        System.out.println(node.getAttributeIndex());
+        DFS(node.splits.entrySet().iterator().next().getValue());
+    }
 }

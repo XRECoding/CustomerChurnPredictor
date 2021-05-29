@@ -39,12 +39,17 @@ public class ID3Utils {
 
         DecisionTreeNode root = new DecisionTreeNode(attributeIndex);
 
+        List<String> hashMap = examples.stream().map(x -> x[labelIndex].getCategory().toString()).distinct().toList();
+        System.out.println(hashMap);
+        /*
         HashMap<String, String> hashMap = new HashMap<>();
         for (int i = 0; i < examples.size(); i++) {
             hashMap.put(examples.get(i)[labelIndex].getCategory().toString(), "");
         }
+        */
 
         if (hashMap.size() == 1){   // all rows have the same class
+            // root.getSplits().put((hashMap.iterator().next()), null); Faster
             if (examples.get(0)[labelIndex].getCategory().toString().equals("1")){
                 root.getSplits().put("+", null);
             } else {
@@ -53,38 +58,28 @@ public class ID3Utils {
 
             return root;
         }
+        int rama = attributeIndex;
+        List<String> intervalMap = examples.stream().map(x -> x[rama].getCategory().toString()).distinct().toList();
+        //System.out.println(intervalMap);
         
-
+        /*
         HashMap<String, String> intervalMap = new HashMap<>();
         for (int i = 0; i < examples.size(); i++) {
             intervalMap.put(examples.get(i)[attributeIndex].getCategory().toString(), "");
         }
+        */
 
-        for (Map.Entry<String, String> entry : intervalMap.entrySet()) {
+        //for (Map.Entry<String, String> entry : intervalMap.entrySet()) {
+        for (String object : intervalMap) {
             int count = attributeIndex;
-            //System.out.println(examples.get(0)[count].getCategory() +  "   " + entry.getKey() + "  |  " + examples.get(0)[count].getCategory().toString().equals(entry.getKey()));
-            
-            List<CSVAttribute[]> clone =  examples.stream().filter(x -> !x[count].getCategory().toString().equals(entry.getKey())).collect(Collectors.toList());
-            //System.out.println(clone.size());
+            List<CSVAttribute[]> clone = examples.stream().filter(x -> !x[count].getCategory().toString().equals(object)).collect(Collectors.toList());
 
-
-            //List<CSVAttribute[]> clone = new LinkedList<CSVAttribute[]>(examples);
             /*
-            int count = attributeIndex;
-            System.out.println("||" + entry.getKey());
-            List<CSVAttribute[]> clone = examples.stream().filter(x -> x[count].getCategory().equals(entry.getKey())).map(x -> x).toList();
-            System.out.println(clone.size());
-            
-            for (int i = examples.size()-1; i > 0; i--) {
-                if (examples.get(i)[attributeIndex].getCategory() != entry.getKey()){
-                    clone.remove(i);
-                }
-            }
-            */
             DecisionTreeNode child = createTree(clone, labelIndex);
-            root.getSplits().put(entry.getKey(), child);
+            root.getSplits().put(object, child);
             if (child == null) continue;
             child.setParent(root);
+            */
         }
 
         return root;
