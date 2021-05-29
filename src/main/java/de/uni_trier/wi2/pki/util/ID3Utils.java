@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 @SuppressWarnings("rawtypes")
 
 /**
@@ -44,7 +45,7 @@ public class ID3Utils {
         }
 
         if (hashMap.size() == 1){   // all rows have the same class
-            if (examples.get(0)[labelIndex].getCategory().toString() == "1"){
+            if (examples.get(0)[labelIndex].getCategory().toString().equals("1")){
                 root.getSplits().put("+", null);
             } else {
                 root.getSplits().put("-", null);
@@ -52,6 +53,7 @@ public class ID3Utils {
 
             return root;
         }
+        
 
         HashMap<String, String> intervalMap = new HashMap<>();
         for (int i = 0; i < examples.size(); i++) {
@@ -59,14 +61,29 @@ public class ID3Utils {
         }
 
         for (Map.Entry<String, String> entry : intervalMap.entrySet()) {
-            List<CSVAttribute[]> clone = new LinkedList<CSVAttribute[]>(examples);
-            for (int i = examples.size(); i > 0; i--) {
+            int count = attributeIndex;
+            //System.out.println(examples.get(0)[count].getCategory() +  "   " + entry.getKey() + "  |  " + examples.get(0)[count].getCategory().toString().equals(entry.getKey()));
+            
+            List<CSVAttribute[]> clone =  examples.stream().filter(x -> !x[count].getCategory().toString().equals(entry.getKey())).collect(Collectors.toList());
+            //System.out.println(clone.size());
+
+
+            //List<CSVAttribute[]> clone = new LinkedList<CSVAttribute[]>(examples);
+            /*
+            int count = attributeIndex;
+            System.out.println("||" + entry.getKey());
+            List<CSVAttribute[]> clone = examples.stream().filter(x -> x[count].getCategory().equals(entry.getKey())).map(x -> x).toList();
+            System.out.println(clone.size());
+            
+            for (int i = examples.size()-1; i > 0; i--) {
                 if (examples.get(i)[attributeIndex].getCategory() != entry.getKey()){
                     clone.remove(i);
                 }
             }
+            */
             DecisionTreeNode child = createTree(clone, labelIndex);
             root.getSplits().put(entry.getKey(), child);
+            if (child == null) continue;
             child.setParent(root);
         }
 
