@@ -21,14 +21,14 @@ public class ID3Utils {
      * @param labelIndex The label of the attribute that should be used as an index.
      * @return The root node of the decision tree
      */
-    public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
+    public static DecisionTreeNode createTree(List<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
         if (examples.size() == 0) return null;
 
         // calculate gain for all attributes and find best gain
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);
         double max = entropyList.get(0);
         int attributeIndex = 0;
-        
+
         for (int i = 1; i < entropyList.size(); i++) {
             if (max < entropyList.get(i)){
                 max = entropyList.get(i);
@@ -59,13 +59,13 @@ public class ID3Utils {
         }
 
         for (Map.Entry<String, String> entry : intervalMap.entrySet()) {
-            LinkedList<CSVAttribute[]> clone = (LinkedList<CSVAttribute[]>) examples.clone();
+            List<CSVAttribute[]> clone = new LinkedList<CSVAttribute[]>(examples);
             for (int i = examples.size(); i > 0; i--) {
                 if (examples.get(i)[attributeIndex].getCategory() != entry.getKey()){
                     clone.remove(i);
                 }
             }
-            DecisionTreeNode child = new DecisionTreeNode(labelIndex);
+            DecisionTreeNode child = createTree(clone, labelIndex);
             root.getSplits().put(entry.getKey(), child);
             child.setParent(root);
         }
