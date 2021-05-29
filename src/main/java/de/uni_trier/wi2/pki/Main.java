@@ -19,7 +19,7 @@ public class Main {
             // reading input data
             List<String[]> linkedList = CSVReader.readCsvToArray("churn_data.csv", ";", true);
             // categorizing input data into CSVAttributes
-            LinkedList<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
+            List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
 
             ID3Utils.createTree(newList, 10);
 

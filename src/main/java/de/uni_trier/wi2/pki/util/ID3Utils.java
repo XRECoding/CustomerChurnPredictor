@@ -21,41 +21,58 @@ public class ID3Utils {
      * @param labelIndex The label of the attribute that should be used as an index.
      * @return The root node of the decision tree
      */
-    public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex, int a) {        // changed collection to linked list
-        if (examples.size() == 1) return null;                          // Rekursionsanker
+    public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex) {        // changed collection to linked list
+        if (examples.size() == 0) return null;
 
-        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);          // calculate entropy gain for all attributes
+        // calculate gain for all attributes and find best gain
+        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);
+        double max = entropyList.get(0);
         int attributeIndex = 0;
-
-        for (int i = 1; i < entropyList.size(); i++) 
-            if (entropyList.get(i) > entropyList.get(attributeIndex))
-                attributeIndex = i; 
-
-        DecisionTreeNode curNode = new DecisionTreeNode(1);           // TODO set Index
-        int numBuckets = getBuckets(examples.get(attributeIndex));
-
-        examples.remove(attributeIndex);
-
-        System.out.println("Start");
-        for (int i = 0; i < numBuckets; i++) {
-            LinkedList<CSVAttribute[]> clonedList = (LinkedList<CSVAttribute[]>) examples.clone();
-            System.out.println("~~> " + i + " child: " + labelIndex + " parent: " + a);
-            DecisionTreeNode child = createTree(clonedList, labelIndex-1, a + 1);
-            if (child == null) continue;
-            child.setParent(curNode);
-            curNode.splits.put(String.valueOf(i), child);                 // TODO Key Index
+        for (int i = 1; i < entropyList.size(); i++) {
+            if (max < entropyList.get(i)){
+                max = entropyList.get(i);
+                attributeIndex = i;
+            }
         }
 
-        System.out.println("ENDE\n");
-        return curNode;
+        DecisionTreeNode root = new DecisionTreeNode(attributeIndex);
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        for (int i = 0; i < examples.size(); i++) {
+            hashMap.put(examples.get(i)[labelIndex].getCategory().toString(), "");
+        }
+
+        if (hashMap.size() == 1){   // all rows have the same class
+            if (examples.get(0)[labelIndex].getCategory().toString() == "1"){
+                root.getSplits().put("+", null);
+            } else {
+                root.getSplits().put("-", null);
+            }
+
+            return root;
+        }
+
+        HashMap<String, String> intervalMap = new HashMap<>();
+        for (int i = 0; i < examples.size(); i++) {
+            intervalMap.put(examples.get(i)[attributeIndex].getCategory().toString(), "");
+        }
+
+        for (Map.Entry<String, String> entry : intervalMap.entrySet()) {
+            LinkedList<CSVAttribute[]> clone = (LinkedList<CSVAttribute[]>) examples.clone();
+            for (int i = examples.size(); i > 0; i--) {
+                if (examples.get(i)[attributeIndex].getCategory() != entry.getKey()){
+                    clone.remove(i);
+                }
+            }
+            DecisionTreeNode child = new DecisionTreeNode(labelIndex);
+            root.getSplits().put(entry.getKey(), child);
+            child.setParent(root);
+        }
+
+        return root;
     }
 
-    // finding all unique values of attribute with best entropy gain
-    public static int getBuckets(CSVAttribute[] array) { 
-        return (array[0] instanceof Continuously)? 
-        Stream.of(array).collect(Collectors.toMap(CSVAttribute::getCategory, p -> p, (p, q) -> p)).values().size():                                     // TODO return number of bins is hardcoded to 5
-        Stream.of(array).collect(Collectors.toMap(CSVAttribute::getValue, p -> p, (p, q) -> p)).values().size();
-    } 
+
 }
 
         /* TODO

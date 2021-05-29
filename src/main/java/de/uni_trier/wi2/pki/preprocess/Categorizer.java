@@ -7,7 +7,7 @@ import de.uni_trier.wi2.pki.io.attr.Continuously;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings("rawtypes")
 
 public class Categorizer {
     public static List<CSVAttribute[]> categorize(List<String[]> linkedList){
@@ -18,7 +18,14 @@ public class Categorizer {
         Boolean[] b = a.stream().map(x -> isCategoric(x.stream().distinct().toList())).toArray(Boolean[]::new);
 
         // Create every attribute from every row to CSVAttribute
-        return linkedList.stream().map(x -> IntStream.range(0, x.length).mapToObj(y -> (b[y])? new Categoric(x[y]) : new Continuously(x[y])).toArray(CSVAttribute[]::new)).toList();
+        List<CSVAttribute[]> c = linkedList.stream().map(x -> IntStream.range(0, x.length).mapToObj(y -> (b[y])? new Categoric(x[y]) : new Continuously(x[y])).toArray(CSVAttribute[]::new)).toList();
+
+
+        for (int i = 0; i < linkedList.get(0).length; i++)
+            if (c.get(0)[i] instanceof Continuously)
+                BinningDiscretizer.discretize(4, c, i);
+
+        return c;
     }
 
     // checks if the column is categoric

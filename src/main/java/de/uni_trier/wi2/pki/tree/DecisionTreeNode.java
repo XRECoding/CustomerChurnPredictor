@@ -25,4 +25,8 @@ public class DecisionTreeNode {                     // Class for representing a 
     public DecisionTreeNode getParent() {
         return parent;
     }
+
+    public HashMap<String, DecisionTreeNode> getSplits(){
+        return splits;
+    }
 }
