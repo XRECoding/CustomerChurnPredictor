@@ -4,6 +4,7 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.Continuously;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -23,7 +24,7 @@ public class BinningDiscretizer {
      */ 
 
     public static List<CSVAttribute[]> discretize(int numberOfBins, List<CSVAttribute[]> examples, int attributeId) {
-        List<CSVAttribute[]> newData = IntStream.range(0, examples.get(0).length).mapToObj(x -> examples.stream().map(y -> y[x]).toArray(CSVAttribute[]::new)).toList(); // TODO change position
+        List<CSVAttribute[]> newData = IntStream.range(0, examples.get(0).length).mapToObj(x -> examples.stream().map(y -> y[x]).toArray(CSVAttribute[]::new)).collect(Collectors.toList()); // TODO change position
 
         CSVAttribute[] array = newData.get(attributeId);
         CSVAttribute min = array[0];

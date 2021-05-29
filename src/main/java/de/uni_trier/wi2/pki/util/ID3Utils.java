@@ -28,6 +28,7 @@ public class ID3Utils {
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);
         double max = entropyList.get(0);
         int attributeIndex = 0;
+        
         for (int i = 1; i < entropyList.size(); i++) {
             if (max < entropyList.get(i)){
                 max = entropyList.get(i);
