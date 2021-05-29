@@ -3,6 +3,8 @@ package de.uni_trier.wi2.pki.preprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.Continuously;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 
@@ -18,9 +20,12 @@ public class BinningDiscretizer {
      * @param examples     The list of examples to discretize.
      * @param attributeId  The ID of the attribute to discretize.
      * @return the list of discretized examples.
-     */
-    public static LinkedList<CSVAttribute[]> discretize(int numberOfBins, LinkedList<CSVAttribute[]> examples, int attributeId) {
-        CSVAttribute[] array = examples.get(attributeId);
+     */ 
+
+    public static List<CSVAttribute[]> discretize(int numberOfBins, List<CSVAttribute[]> examples, int attributeId) {
+        List<CSVAttribute[]> newData = IntStream.range(0, examples.get(0).length).mapToObj(x -> examples.stream().map(y -> y[x]).toArray(CSVAttribute[]::new)).toList(); // TODO change position
+
+        CSVAttribute[] array = newData.get(attributeId);
         CSVAttribute min = array[0];
         CSVAttribute max = array[0];
 
@@ -44,6 +49,6 @@ public class BinningDiscretizer {
             object.setCategory(category);
         }
 
-        return examples;
+        return newData;
     }
 }
