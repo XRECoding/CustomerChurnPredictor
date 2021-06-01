@@ -3,89 +3,55 @@ package de.uni_trier.wi2.pki.util;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @SuppressWarnings("rawtypes")
 
-/**
- * Contains methods that help with computing the entropy.
- */
 public class EntropyUtils {
+    public static List<Double> calcInformationGain(List<CSVAttribute[]> matrix, int labelIndex) { 
+        Map<Integer, Map<String, Map<String, Integer>>> map = new HashMap<>();              // Create Map with refrences
+        for (int i = 0; i < matrix.get(0).length; i++) map.put(i, new HashMap<>());         // Set refreces for all Attributes
 
-    /**
-     * Calculates the information gain for all attributes
-     *
-     * @param matrix     Matrix of the training data (example data), e.g. ArrayList<String[]>
-     * @param labelIndex the index of the attribute that contains the class. If the dataset is [Temperature,Weather,PlayFootball] and you want to predict playing
-     *                   football, than labelIndex is 2
-     * @return the information gain for each attribute
-     */
-    public static List<Double> calcInformationGain(List<CSVAttribute[]> matrix, int labelIndex) {     // changed Collection to LinkedList
-        List<CSVAttribute[]> newData = IntStream.range(0, matrix.get(0).length).mapToObj(x -> matrix.stream().map(y -> y[x]).toArray(CSVAttribute[]::new)).collect(Collectors.toList()); // TODO change position
-        List<Double> output = new LinkedList<>();
-        CSVAttribute[] exitedArray = newData.get(labelIndex);
 
-        double positive = 0;
+        matrix.stream().forEach(array -> {                                                  // Stream over matrix to fill map
+            for (int i = 0; i < array.length; i++) {                                        // Iterate over each entry
+                String bucket = array[i].getCategory().toString();                          // Create refrence with the category    ~> Interval
+                String key = array[labelIndex].getCategory().toString();                    // Create refrence with the labelindex  ~> 1/0
 
-        for (int i = 0; i < exitedArray.length; i++) {
-            if(Integer.parseInt(exitedArray[i].getValue().toString()) == 1){positive++;}        // only accounts for boolean classes
-        }
+                if (map.get(i).get(bucket) == null)                                         // Create refrence if there is none
+                    map.get(i).put(bucket, new HashMap<>());                            
+                if (map.get(i).get(bucket).get(key) == null)                                // Create a startpoint if there is none
+                    map.get(i).get(bucket).put(key, 1);                                     // Start counting with
+                else
+                    map.get(i).get(bucket).put(key, map.get(i).get(bucket).get(key)+1);     // Count all keys (~> 1/0) for each bucket
+            } 
+        });
 
-        double negative = exitedArray.length - positive;
 
-        double entropy = (-positive/(positive + negative) * log2(positive/(positive + negative))) -(negative/(positive + negative) * log2(negative/(positive + negative))); // H(E)
-
-//        System.out.println(entropy);
-
-        // calculating entropy per attribute
-        for (int i = 0; i < newData.size(); i++) {
-            if(i != labelIndex){
-                HashMap<String, double[]> hashMap = new HashMap<>();
-                CSVAttribute[] csvAttributes = newData.get(i);
-                // counting positive and negative per interval
-                for (int j = 0; j < csvAttributes.length; j++) {
-                    try{
-                        double[] counterArray = hashMap.get(csvAttributes[j].getCategory().toString());        // array counts class = 0 in position 0 and class = 1 in position 1; generic implementation requires hashmap
-                        if (exitedArray[j].getValue().toString().equals("0")){
-                            counterArray[0]++;
-                        }else{
-                            counterArray[1]++;
-                        }
-                        hashMap.put(csvAttributes[j].getCategory().toString(), counterArray);
-
-                    }catch (NullPointerException e){
-                        if (exitedArray[j].getValue().toString().equals("0")){
-                            hashMap.put(csvAttributes[j].getCategory().toString(), new double[] {1, 0});
-                        }else{
-                            hashMap.put(csvAttributes[j].getCategory().toString(), new double[] {0, 1});
-                        }
-                    }
-                }
-
-                // calculating entropy per interval
-                double restEntropy = 0;
-                for (Map.Entry<String, double[]> entry: hashMap.entrySet()){
-                    double[] array = entry.getValue();
-                    double intervalEntropy = (-array[1]/(array[1] + array[0]) * log2(array[1]/(array[1] + array[0]))) -(array[0]/(array[1] + array[0]) * log2(array[0]/(array[1] + array[0]))); // H(E i)
-                    // calculating rest entropy R(A)
-                    restEntropy = restEntropy + (((array[1] + array[0])/ csvAttributes.length) * intervalEntropy);
-
-                }
-
-                // calculating gain
-                double gain = entropy - restEntropy;
-//                System.out.println("Gain for Attribute is: " + gain);
-                output.add(gain);
-            }
-        }
-
-        return output;
+        Double r = HE(map.get(labelIndex).values().stream().map(x -> x.entrySet()           // Stream over the map with labelindex
+            .iterator().next().getValue().intValue()).collect(Collectors.toList()));        // Compute H(E)
+            
+        return map.entrySet().stream().filter(x -> (x.getKey() != labelIndex))              // Stream over map and every bucket
+            .mapToDouble(x -> r - x.getValue().entrySet().stream().mapToDouble(y ->         // Compute H(Ei) and R(A) for each bucket
+            H(y.getValue(), matrix.size())).sum()).boxed().collect(Collectors.toList());    // return a List with the entropy
     }
 
-    public static double log2(double value){
-        return (Math.log(value) / Math.log(2));
+
+////////////////////////// Helper Functions ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static Double HE(List<Integer> l) {
+        Double count = Double.valueOf(l.stream().reduce(0, Integer::sum));                  // Get the sum of all attributes
+        return l.stream().mapToDouble(x -> -x/count*log2(x/count)).sum();                   // Return H(E) for the labelindex
+    }
+
+    public static Double H(Map<String, Integer> map, int n) {
+        Double count = Double.valueOf(map.values().stream().reduce(0, Integer::sum));       // Get the sum of all attributes
+        Double h = map.values().stream().mapToDouble(x -> -x/count*log2(x/count)).sum();    // Compute H(e) for each e e bucket
+        return (count/n) * h;                                                               // return R(A)
+    }
+
+    public static double log2(double value) {
+        return (Math.log(value) / Math.log(2));                                             // returns the log to the base of 2
     }
 }
-
 
 // TODO Algorithms is not able to work with "divide by zero". ~> Unsure if the Algorithm knows what to do when multiplying by zero
