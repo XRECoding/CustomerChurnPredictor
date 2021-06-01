@@ -25,7 +25,7 @@ public class ID3Utils {
 
 
 
-        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
+        List<Double> entropyList = newTest.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
         int bestIndex = 0;                      
 
         for (int i = 1; i < entropyList.size(); i++) {                  // Iterate thru the entropy set

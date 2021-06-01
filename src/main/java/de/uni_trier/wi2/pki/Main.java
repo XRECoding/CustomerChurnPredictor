@@ -5,7 +5,10 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.preprocess.BinningDiscretizer;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+import de.uni_trier.wi2.pki.util.EntropyUtils;
 import de.uni_trier.wi2.pki.util.ID3Utils;
+import de.uni_trier.wi2.pki.util.newTest;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +29,11 @@ public class Main {
             List<String[]> linkedList = CSVReader.readCsvToArray("churn_data.csv", ";", true);
             
             // categorizing input data into CSVAttributes
+            
             List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
+            EntropyUtils.calcInformationGain(newList, 10).forEach(System.out::println);
+            System.out.println();
+            newTest.calcInformationGain(newList, 10).forEach(System.out::println);
             DecisionTreeNode root =  ID3Utils.createTree(newList, 10);
             DFS(root);
             
