@@ -2,7 +2,13 @@ package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,18 +85,53 @@ public class ID3Utils {
                        .collect(Collectors.toList());
     }
 
+    public static void printTree(DecisionTreeNode root) throws ParserConfigurationException {
+        // create and configure outputSteam
+        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+        xmlOutputter.getFormat().setExpandEmptyElements(true);
+
+        // create document and content root
+        Element rootElement = new Element("Attribut"+String.valueOf(root.getAttributeIndex()));
+        Document doc = new Document(rootElement);
+
+        addChildren(root, rootElement);
+//        Element eleA = new Element("A");
+//        rootElement.addContent(eleA);
+//        rootElement.addContent(new Element("B"));
+//        rootElement.addContent(new Element("C"));
+//
+//        eleA.addContent(new Element("A1"));
+//        eleA.addContent(new Element("A2"));
+//        eleA.addContent(new Element("A3"));
+
+
+
+
+
+
+        // output the xml file
+        try{
+            xmlOutputter.output(doc, System.out);
+        }catch (IOException e){
+            System.out.println(e.getStackTrace());
+        }
+    }
+
+    public static void addChildren(DecisionTreeNode root, Element jdomRoot){
+        for (Map.Entry<String, DecisionTreeNode> entry : root.getSplits().entrySet()) {
+            if (entry.getValue() != null){
+                Element element = new Element("Attribut" + String.valueOf(entry.getValue().getAttributeIndex()));
+                jdomRoot.addContent(element);
+                addChildren(entry.getValue(), element);
+            } else {
+                Element element = new Element("null");
+                jdomRoot.addContent(element);
+            }
+
+        }
+    }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
-        /* TODO
-            1. calculate entropy
-            2. create node and set to newNode
-            3. choose attribute with highest gain
-            4. if only + / - class
-                    return newNode
-            5. for every category
-                5a. create treeNode
-                5b. examples = examples - attribute used
-                5c. createTree(examples, labelIndex -1)
-         */
