@@ -2,6 +2,8 @@ package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @SuppressWarnings("rawtypes")
 
@@ -18,9 +20,10 @@ public class EntropyUtils {
      *                   football, than labelIndex is 2
      * @return the information gain for each attribute
      */
-    public static List<Double> calcInformationGain(LinkedList<CSVAttribute[]> matrix, int labelIndex) {     // changed Collection to LinkedList
+    public static List<Double> calcInformationGain(List<CSVAttribute[]> matrix, int labelIndex) {     // changed Collection to LinkedList
+        List<CSVAttribute[]> newData = IntStream.range(0, matrix.get(0).length).mapToObj(x -> matrix.stream().map(y -> y[x]).toArray(CSVAttribute[]::new)).collect(Collectors.toList()); // TODO change position
         List<Double> output = new LinkedList<>();
-        CSVAttribute[] exitedArray = matrix.get(labelIndex);
+        CSVAttribute[] exitedArray = newData.get(labelIndex);
 
         double positive = 0;
 
@@ -35,10 +38,10 @@ public class EntropyUtils {
 //        System.out.println(entropy);
 
         // calculating entropy per attribute
-        for (int i = 0; i < matrix.size(); i++) {
+        for (int i = 0; i < newData.size(); i++) {
             if(i != labelIndex){
                 HashMap<String, double[]> hashMap = new HashMap<>();
-                CSVAttribute[] csvAttributes = matrix.get(i);
+                CSVAttribute[] csvAttributes = newData.get(i);
                 // counting positive and negative per interval
                 for (int j = 0; j < csvAttributes.length; j++) {
                     try{

@@ -3,67 +3,39 @@ package de.uni_trier.wi2.pki.preprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.Categoric;
 import de.uni_trier.wi2.pki.io.attr.Continuously;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@SuppressWarnings("rawtypes")
 
 public class Categorizer {
+    public static List<CSVAttribute[]> categorize(List<String[]> linkedList){   
+        // Switch from rows to colummns
+        List<List<String>> a = IntStream.range(0, linkedList.get(0).length).mapToObj(x -> linkedList.stream().map(y -> y[x]).collect(Collectors.toList())).collect(Collectors.toList()); // TODO change position
 
-    public static LinkedList<CSVAttribute[]> categorize(List<String[]> linkedList){
-        LinkedList<CSVAttribute[]> output = new LinkedList<>();     // output list
+        // Check what is Categoric
+        Boolean[] b = a.stream().map(x -> isCategoric(x.stream().distinct().collect(Collectors.toList()))).toArray(Boolean[]::new);
 
-        // making a hashmap for every column of the dataset
-        Map<String,Integer>[] mapArray = new HashMap[linkedList.get(0).length];
-
-        for (int n = 0; n < mapArray.length; n++){
-            mapArray[n] = new HashMap<String,Integer>();
-        }
-
-
-        // count unique values for each column (for isCategoric check)
-        for (String[] element : linkedList){
-            for (int i = 0; i < element.length; i++){
-                if (mapArray[i].get(element[i]) == null){
-                    mapArray[i].put(element[i], 1);
-                }else{
-                    mapArray[i].put(element[i], mapArray[i].get(element[i])+1);
-                }
-            }
-        }
-
-        // checking each column for categoric / continuously
-        AtomicInteger i = new AtomicInteger(0);
-        for (; i.intValue() < mapArray.length; i.incrementAndGet()) {
-            CSVAttribute[] array = new CSVAttribute[linkedList.size()];
-            AtomicInteger index = new AtomicInteger(0);
-
-            if (isCategoric(mapArray[i.intValue()])) {
-                linkedList.stream().forEach(x -> array[index.incrementAndGet()-1] = new Categoric(x[i.intValue()]));
-                output.add(array);
-            } else {
-                linkedList.stream().forEach(x -> array[index.incrementAndGet()-1] = new Continuously(x[i.intValue()]));
-                output.add(array);
-                // column is continuously and has to be discretized
-                BinningDiscretizer.discretize(5, output, output.size()-1);      // TODO number of bins is hardcoded to 5
-            }
-        }
+        // Create every attribute from every row to CSVAttribute
+        List<CSVAttribute[]> c = linkedList.stream().map(x -> IntStream.range(0, x.length).mapToObj(y -> (b[y])? new Categoric(x[y]) : new Continuously(x[y])).toArray(CSVAttribute[]::new)).collect(Collectors.toList());
 
 
-        return output;
+        for (int i = 0; i < linkedList.get(0).length; i++) 
+            if (c.get(0)[i] instanceof Continuously)
+                BinningDiscretizer.discretize(3, c, i);
+
+        return c;
     }
 
-
     // checks if the column is categoric
-    public static boolean isCategoric(Map<String, Integer> map) {
+    public static boolean isCategoric(List<String> list) {
         try {
-            Double.parseDouble(map.entrySet().iterator().next().getKey());
+            Double.parseDouble(list.get(0));
         } catch (Exception e) {
             return true;
         }
-        return map.size() == 2;
+        return list.size() == 2;
     }
 }

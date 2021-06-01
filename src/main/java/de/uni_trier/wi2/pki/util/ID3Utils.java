@@ -1,11 +1,10 @@
 package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
-import de.uni_trier.wi2.pki.io.attr.Continuously;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SuppressWarnings("rawtypes")
 
@@ -19,51 +18,77 @@ public class ID3Utils {
      *
      * @param examples   The examples to train with. This is a collection of arrays.
      * @param labelIndex The label of the attribute that should be used as an index.
-     * @return The root node of the decision tree
+     * @return The newNode node of the decision tree
      */
-    public static DecisionTreeNode createTree(LinkedList<CSVAttribute[]> examples, int labelIndex, int a) {        // changed collection to linked list
-        if (examples.size() == 1) return null;                          // Rekursionsanker
+    public static DecisionTreeNode createTree(List<CSVAttribute[]> examples, int labelIndex) {
+        if (examples.size() == 0) return null;
 
-        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);          // calculate entropy gain for all attributes
-        int attributeIndex = 0;
 
-        for (int i = 1; i < entropyList.size(); i++) 
-            if (entropyList.get(i) > entropyList.get(attributeIndex))
-                attributeIndex = i; 
 
-        DecisionTreeNode curNode = new DecisionTreeNode(1);           // TODO set Index
-        int numBuckets = getBuckets(examples.get(attributeIndex));
+        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
 
-        examples.remove(attributeIndex);
+        entropyList.forEach(System.out::println);
+        
 
-        System.out.println("Start");
-        for (int i = 0; i < numBuckets; i++) {
-            LinkedList<CSVAttribute[]> clonedList = (LinkedList<CSVAttribute[]>) examples.clone();
-            System.out.println("~~> " + i + " child: " + labelIndex + " parent: " + a);
-            DecisionTreeNode child = createTree(clonedList, labelIndex-1, a + 1);
-            if (child == null) continue;
-            child.setParent(curNode);
-            curNode.splits.put(String.valueOf(i), child);                 // TODO Key Index
+        System.out.println();
+        int bestIndex = 0;                      
+
+        for (int i = 1; i < entropyList.size(); i++) {                  // Iterate thru the entropy set
+            if (entropyList.get(bestIndex) < entropyList.get(i))        // Find the best entropy
+                bestIndex = i;                                          // Set a refrence to the new best entropy
         }
 
-        System.out.println("ENDE\n");
-        return curNode;
+
+
+        DecisionTreeNode newNode = new DecisionTreeNode(bestIndex);     // Create new node, that has a reference to a position
+        List<String> keys = getDistinct(examples, labelIndex);          // Get all the diffrent unique values on position ~labelIndex
+
+        if (keys.size() == 1) {                                         // Prune branche if the rest of the branche is the same.
+            newNode.getSplits().put((keys.iterator().next()), null);    // The branche is turned into a leef and gets a refrence to its key
+            return newNode;                                             // Retrun leef node
+        }
+
+
+
+        
+        List<String> buckets = getDistinct(examples, bestIndex);        // Get all the diffrent unique values on position ~bestIndex
+
+        for (String bucket : buckets) {                                             // Generate rest of tree for each bucket
+            List<CSVAttribute[]> clone = getClone(examples, bucket, bestIndex);     // Get a clone that ony has the entrys for the given bucket
+            DecisionTreeNode child = createTree(clone, labelIndex);                 // Build rest of the tree
+
+            newNode.getSplits().put(bucket, child);                     // Give the parent a refrence to its children
+            if (child == null) continue;
+            child.setParent(newNode);                                   // Give the children a refrence to its parent
+        }
+        return newNode;
     }
 
-    // finding all unique values of attribute with best entropy gain
-    public static int getBuckets(CSVAttribute[] array) { 
-        return (array[0] instanceof Continuously)? 
-        Stream.of(array).collect(Collectors.toMap(CSVAttribute::getCategory, p -> p, (p, q) -> p)).values().size():                                     // TODO return number of bins is hardcoded to 5
-        Stream.of(array).collect(Collectors.toMap(CSVAttribute::getValue, p -> p, (p, q) -> p)).values().size();
-    } 
+////////////////////// Helper Functions //////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Returns all unique values in a list at a given index.
+    public  static List<String> getDistinct(List<CSVAttribute[]> examples, int index) {
+        return examples.stream().map(x -> x[index].getCategory().toString())
+                       .distinct().collect(Collectors.toList());
+    }
+
+    // Retruns a set of entrys that is part of the bucket. 
+    public static List<CSVAttribute[]> getClone(List<CSVAttribute[]> examples, String bucket, int index) {
+        return examples.stream().filter(x -> !x[index].getCategory().toString().equals(bucket))
+                       .collect(Collectors.toList());
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
         /* TODO
             1. calculate entropy
-            2. create node and set to root
+            2. create node and set to newNode
             3. choose attribute with highest gain
             4. if only + / - class
-                    return root
+                    return newNode
             5. for every category
                 5a. create treeNode
                 5b. examples = examples - attribute used
