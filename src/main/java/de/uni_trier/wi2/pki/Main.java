@@ -31,9 +31,9 @@ public class Main {
             // categorizing input data into CSVAttributes
             
             List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
-            EntropyUtils.calcInformationGain(newList, 10).forEach(System.out::println);
+            //EntropyUtils.calcInformationGain(newList, 10).forEach(System.out::println);
             System.out.println();
-            newTest.calcInformationGain(newList, 10).forEach(System.out::println);
+            //newTest.calcInformationGain(newList, 10).forEach(System.out::println);
             DecisionTreeNode root =  ID3Utils.createTree(newList, 10);
             DFS(root);
             
