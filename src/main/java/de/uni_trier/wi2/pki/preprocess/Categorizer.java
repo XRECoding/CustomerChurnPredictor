@@ -11,23 +11,30 @@ import java.util.stream.IntStream;
 @SuppressWarnings("rawtypes")
 
 public class Categorizer {
-    public static List<CSVAttribute[]> categorize(List<String[]> linkedList){   
+    public static List<CSVAttribute[]> categorize(List<String[]> list){   
         // Switch from rows to colummns
-        List<List<String>> a = IntStream.range(0, linkedList.get(0).length).mapToObj(x -> linkedList.stream().map(y -> y[x]).collect(Collectors.toList())).collect(Collectors.toList()); // TODO change position
+        List<List<String>> columns = IntStream.range(0, list.get(0).length)
+            .mapToObj(x -> list.stream().map(y -> y[x])
+            .collect(Collectors.toList())).collect(Collectors.toList());    // TODO change position
 
         // Check what is Categoric
-        Boolean[] b = a.stream().map(x -> isCategoric(x.stream().distinct().collect(Collectors.toList()))).toArray(Boolean[]::new);
+        Boolean[] csvBooleans = columns.stream().map(x -> isCategoric(x.stream()
+            .distinct().collect(Collectors.toList()))).toArray(Boolean[]::new);
 
         // Create every attribute from every row to CSVAttribute
-        List<CSVAttribute[]> c = linkedList.stream().map(x -> IntStream.range(0, x.length).mapToObj(y -> (b[y])? new Categoric(x[y]) : new Continuously(x[y])).toArray(CSVAttribute[]::new)).collect(Collectors.toList());
+        List<CSVAttribute[]> csvAttributes = list.stream().map(x -> IntStream.range(0, x.length)
+            .mapToObj(y -> (csvBooleans[y])? new Categoric(x[y]) : new Continuously(x[y]))
+            .toArray(CSVAttribute[]::new)).collect(Collectors.toList());
 
+        // Set Buckets for each continuously attribute
+        for (int i = 0; i < list.get(0).length; i++) 
+            if (csvAttributes.get(0)[i] instanceof Continuously)
+                BinningDiscretizer.discretize(3, csvAttributes, i);         // Buckets
 
-        for (int i = 0; i < linkedList.get(0).length; i++) 
-            if (c.get(0)[i] instanceof Continuously)
-                BinningDiscretizer.discretize(3, c, i);
-
-        return c;
+        return csvAttributes;
     }
+
+////////////////////////// Helper Functions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // checks if the column is categoric
     public static boolean isCategoric(List<String> list) {

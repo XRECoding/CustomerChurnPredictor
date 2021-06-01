@@ -1,16 +1,18 @@
 package de.uni_trier.wi2.pki.util;
 
-import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
-import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.text.Format;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
+
+import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
+import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
 @SuppressWarnings("rawtypes")
 
@@ -29,14 +31,7 @@ public class ID3Utils {
     public static DecisionTreeNode createTree(List<CSVAttribute[]> examples, int labelIndex) {
         if (examples.size() == 0) return null;
 
-
-
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
-
-        entropyList.forEach(System.out::println);
-        
-
-        System.out.println();
         int bestIndex = 0;                      
 
         for (int i = 1; i < entropyList.size(); i++) {                  // Iterate thru the entropy set
@@ -85,6 +80,7 @@ public class ID3Utils {
                        .collect(Collectors.toList());
     }
 
+    
     public static void printTree(DecisionTreeNode root) throws ParserConfigurationException {
         // create and configure outputSteam
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
@@ -130,6 +126,7 @@ public class ID3Utils {
 
         }
     }
+    
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
