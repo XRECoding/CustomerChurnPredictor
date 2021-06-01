@@ -41,24 +41,12 @@ public class Main {
 
 
 
-            //BinningDiscretizer.discretize(numberOfBins, examples, attributeId)
-
-            //ID3Utils.createTree(newList, 10);
-
-
 
         }catch (IOException e){
             System.out.println(e.getStackTrace());
         }
 
 
-        /*
-            1. CSVReader
-            2. BinningDiscretizer
-            3. construct tree
-            4. crossValidator
-            5. Pruning
-         */
 
     }
 

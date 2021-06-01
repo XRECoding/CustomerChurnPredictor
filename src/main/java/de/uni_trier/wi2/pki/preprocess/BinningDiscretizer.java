@@ -45,7 +45,8 @@ public class BinningDiscretizer {
         for (int i = 0; i < array.length; i++) {
             Continuously object = (Continuously) array[i];
             double value = Double.parseDouble(object.getValue().toString());
-            int category = (int) ((value-minValue) / (intervalSize + 1));
+            int category = (int) ((value-minValue) / (intervalSize));
+            if (category >= numberOfBins) category = numberOfBins-1;  // put the max element into the last bucket
             object.setCategory(category);
         }
 
