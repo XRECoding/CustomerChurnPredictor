@@ -6,7 +6,7 @@ end
 
 def TreeNode buildTreeUtils(data, index, visited)
     entropyList ← calcInformationGain(data, index);
-    maxIndex    ← getMaxIndex(entropyList, visited);               // returns max index that has not yet been visited
+    maxIndex    ← getMaxIndex(entropyList, visited);               // returns max index that has not yet been visited and is not key index
     parentNode  ← new TreeNode(maxIndex);
     
     visited[maxIndex] <- true;

@@ -37,12 +37,17 @@ public class ID3Utils {
 
     public static DecisionTreeNode treeUtils(List<CSVAttribute[]> examples, int labelIndex, int p, boolean visited[]) {
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
-        int bestIndex = 0;                      
+        int bestIndex = -1;                      
 
-        for (int i = 1; i < entropyList.size(); i++) {                                 // Iterate thru the entropy set
-            if (entropyList.get(bestIndex) < entropyList.get(i) && !visited[i])        // Find the best entropy
-                bestIndex = i;                                                         // Set a refrence to the new best entropy
+
+        for (int i = 0; i < entropyList.size(); i++) {
+            if (visited[i] || i == labelIndex) continue;
+            if (bestIndex == -1) bestIndex = i;
+            else if (entropyList.get(bestIndex) < entropyList.get(i))      
+                bestIndex = i;                                                        
         }
+ 
+
 
         visited[bestIndex] = true;
 
@@ -50,14 +55,16 @@ public class ID3Utils {
         DecisionTreeNode newNode = new DecisionTreeNode(bestIndex);     // Create new node, that has a reference to a position
         List<String> keys = getDistinct(examples, labelIndex);          // Get all the diffrent unique values on position ~labelIndex
 
-        if (keys.size() == 1) {                                                 // Prune branche if the rest of the branche is the same.
+        if (keys.size() == 1 || !moreOptions(visited, labelIndex) || entropyList.get(bestIndex) == 0.0) {                                                 // Prune branche if the rest of the branche is the same.
             newNode.getSplits().put(getMajority(examples,labelIndex), null);    // The branche is turned into a leef and gets a refrence to its key
             return newNode;                                                     // Retrun leef node
         }
 
 
+
+
         for (Map.Entry<String, List<CSVAttribute[]>> entry : splitData(examples, bestIndex).entrySet()) {
-            DecisionTreeNode child = treeUtils(entry.getValue(), labelIndex-1, p+1, visited.clone());
+            DecisionTreeNode child = treeUtils(entry.getValue(), labelIndex, p+1, visited.clone());
 
             newNode.getSplits().put(entry.getKey(), child);
             child.setParent(newNode);
@@ -97,6 +104,13 @@ public class ID3Utils {
         data.stream().forEach(array -> map.get(array[index]
             .getCategory().toString()).add(array));
         return map;
+    }
+
+    public static boolean moreOptions(boolean array[], int index) {
+        for (int i = 0; i < array.length; i++)
+            if (i == index) continue;
+            else if (array[i] == false) return true; 
+        return false;
     }
 
     /*
