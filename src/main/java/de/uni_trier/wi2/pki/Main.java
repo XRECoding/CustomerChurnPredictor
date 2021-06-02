@@ -30,8 +30,11 @@ public class Main {
     }
 
     public static void DFS(DecisionTreeNode node) {
-        if (node == null) return;
-
+        
+        if (node.getSplits().entrySet().iterator().next().getValue() == null) {
+            System.out.println(node.getSplits().entrySet().iterator().next().getKey());
+            return;
+        }
         System.out.println(node.getAttributeIndex());
         DFS(node.getSplits().entrySet().iterator().next().getValue());
     }

@@ -3,7 +3,10 @@ package de.uni_trier.wi2.pki.util;
 import java.io.IOException;
 import java.text.Format;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -29,39 +32,37 @@ public class ID3Utils {
      * @return The newNode node of the decision tree
      */
     public static DecisionTreeNode createTree(List<CSVAttribute[]> examples, int labelIndex) {
-        if (examples.size() == 0) return null;
+        return treeUtils(examples, labelIndex, 0, new boolean[examples.get(0).length]);
+    }
 
+    public static DecisionTreeNode treeUtils(List<CSVAttribute[]> examples, int labelIndex, int p, boolean visited[]) {
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
         int bestIndex = 0;                      
 
-        for (int i = 1; i < entropyList.size(); i++) {                  // Iterate thru the entropy set
-            if (entropyList.get(bestIndex) < entropyList.get(i))        // Find the best entropy
-                bestIndex = i;                                          // Set a refrence to the new best entropy
+        for (int i = 1; i < entropyList.size(); i++) {                                 // Iterate thru the entropy set
+            if (entropyList.get(bestIndex) < entropyList.get(i) && !visited[i])        // Find the best entropy
+                bestIndex = i;                                                         // Set a refrence to the new best entropy
         }
 
+        visited[bestIndex] = true;
 
 
         DecisionTreeNode newNode = new DecisionTreeNode(bestIndex);     // Create new node, that has a reference to a position
         List<String> keys = getDistinct(examples, labelIndex);          // Get all the diffrent unique values on position ~labelIndex
 
-        if (keys.size() == 1) {                                         // Prune branche if the rest of the branche is the same.
-            newNode.getSplits().put((keys.iterator().next()), null);    // The branche is turned into a leef and gets a refrence to its key
-            return newNode;                                             // Retrun leef node
+        if (keys.size() == 1) {                                                 // Prune branche if the rest of the branche is the same.
+            newNode.getSplits().put(getMajority(examples,labelIndex), null);    // The branche is turned into a leef and gets a refrence to its key
+            return newNode;                                                     // Retrun leef node
         }
 
 
+        for (Map.Entry<String, List<CSVAttribute[]>> entry : splitData(examples, bestIndex).entrySet()) {
+            DecisionTreeNode child = treeUtils(entry.getValue(), labelIndex-1, p+1, visited.clone());
 
-        
-        List<String> buckets = getDistinct(examples, bestIndex);        // Get all the diffrent unique values on position ~bestIndex
-
-        for (String bucket : buckets) {                                             // Generate rest of tree for each bucket
-            List<CSVAttribute[]> clone = getClone(examples, bucket, bestIndex);     // Get a clone that ony has the entrys for the given bucket
-            DecisionTreeNode child = createTree(clone, labelIndex);                 // Build rest of the tree
-
-            newNode.getSplits().put(bucket, child);                     // Give the parent a refrence to its children
-            if (child == null) continue;
-            child.setParent(newNode);                                   // Give the children a refrence to its parent
+            newNode.getSplits().put(entry.getKey(), child);
+            child.setParent(newNode);
         }
+
         return newNode;
     }
 
@@ -70,17 +71,35 @@ public class ID3Utils {
 
     // Returns all unique values in a list at a given index.
     public  static List<String> getDistinct(List<CSVAttribute[]> examples, int index) {
-        return examples.stream().map(x -> x[index].getCategory().toString())
-                       .distinct().collect(Collectors.toList());
+        return examples.stream().filter(x -> x[index] != null).map(x -> x[index].getCategory().toString())
+            .distinct().collect(Collectors.toList());
     }
 
-    // Retruns a set of entrys that is part of the bucket. 
-    public static List<CSVAttribute[]> getClone(List<CSVAttribute[]> examples, String bucket, int index) {
-        return examples.stream().filter(x -> !x[index].getCategory().toString().equals(bucket))
-                       .collect(Collectors.toList());
+    public static String getMajority(List<CSVAttribute[]> data, int keyIndex) {
+        Map<String, Integer> map = new HashMap<>();
+
+        data.stream().forEach(x -> {
+            String key = x[keyIndex].getCategory().toString();
+            if (map.get(key) == null) map.put(key, 1);
+            else map.put(key, map.get(key)+1);
+        });
+
+        return Collections.max(map.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
     }
 
-    
+
+    public static Map<String, List<CSVAttribute[]>> splitData(List<CSVAttribute[]> data, int index) {
+        List<String> buckets = getDistinct(data, index);
+        
+        Map<String, List<CSVAttribute[]>> map = new HashMap<>();
+        for (String bucket : buckets) map.put(bucket, new LinkedList<>());
+
+        data.stream().forEach(array -> map.get(array[index]
+            .getCategory().toString()).add(array));
+        return map;
+    }
+
+    /*
     public static void printTree(DecisionTreeNode root) throws ParserConfigurationException {
         // create and configure outputSteam
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
@@ -126,7 +145,7 @@ public class ID3Utils {
 
         }
     }
-    
+    */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
