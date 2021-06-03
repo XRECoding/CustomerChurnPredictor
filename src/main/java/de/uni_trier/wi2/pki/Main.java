@@ -12,18 +12,23 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 
 public class Main {
+    public static double[] intervalSizes;
 
     public static void main(String[] args) {
         try {
             // reading input data
             List<String[]> linkedList = CSVReader.readCsvToArray("churn_data.csv", ";", true);
-            
+
+            // initializing intervalSize array
+            intervalSizes = new double[linkedList.size()];
+
             // categorizing input data into CSVAttributes
             List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
 
             // Create Tree
             DecisionTreeNode root =  ID3Utils.createTree(newList, 10);
-            DFS(root);
+//            DFS(root);
+            ID3Utils.printTree(root);
         } catch (IOException e) {
             System.out.println(e.getStackTrace());
         }

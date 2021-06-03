@@ -5,7 +5,6 @@ import de.uni_trier.wi2.pki.io.attr.Continuously;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import static de.uni_trier.wi2.pki.Main.intervalSizes;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
