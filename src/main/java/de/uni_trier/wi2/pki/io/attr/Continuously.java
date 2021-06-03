@@ -6,7 +6,6 @@ public class Continuously implements CSVAttribute {
     private Object value;
     private int category;
 
-
     public Continuously(Object value) {
         this.value = value;
     }
