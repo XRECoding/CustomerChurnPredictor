@@ -1,21 +1,17 @@
 package de.uni_trier.wi2.pki.util;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.Format;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+import static de.uni_trier.wi2.pki.Main.intervalSizes;
 
 @SuppressWarnings("rawtypes")
 
@@ -113,53 +109,58 @@ public class ID3Utils {
         return false;
     }
 
-    /*
-    public static void printTree(DecisionTreeNode root) throws ParserConfigurationException {
+    public static void printTree(DecisionTreeNode treeRoot) {
         // create and configure outputSteam
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         xmlOutputter.getFormat().setExpandEmptyElements(true);
+        xmlOutputter.getFormat().setIndent("      ");
+//        xmlOutputter.getFormat().setEscapeStrategy(new EscapeStrategy() {
+//            @Override
+//            public boolean shouldEscape(char c) {
+//                return Character.isDigit(c);
+//            }
+//        });
 
         // create document and content root
-        Element rootElement = new Element("Attribut"+String.valueOf(root.getAttributeIndex()));
-        Document doc = new Document(rootElement);
+        Element root = new Element("DecisionTree");
+        Document doc = new Document(root);
 
-        addChildren(root, rootElement);
-//        Element eleA = new Element("A");
-//        rootElement.addContent(eleA);
-//        rootElement.addContent(new Element("B"));
-//        rootElement.addContent(new Element("C"));
-//
-//        eleA.addContent(new Element("A1"));
-//        eleA.addContent(new Element("A2"));
-//        eleA.addContent(new Element("A3"));
-
-
-
-
-
+        Element treeRootElement = new Element("Node_With_AttributeID"+treeRoot.getAttributeIndex());
+        root.addContent(treeRootElement);
+        addXmlChildren(treeRoot, treeRootElement);
 
         // output the xml file
         try{
+//            FileOutputStream fileOutputStream = new FileOutputStream("D:\\Dokumente\\test.xml");
+//            xmlOutputter.output(doc, fileOutputStream);
             xmlOutputter.output(doc, System.out);
+
         }catch (IOException e){
             System.out.println(e.getStackTrace());
         }
     }
 
-    public static void addChildren(DecisionTreeNode root, Element jdomRoot){
+    public static void addXmlChildren(DecisionTreeNode root, Element jdomRoot){
         for (Map.Entry<String, DecisionTreeNode> entry : root.getSplits().entrySet()) {
             if (entry.getValue() != null){
-                Element element = new Element("Attribut" + String.valueOf(entry.getValue().getAttributeIndex()));
-                jdomRoot.addContent(element);
-                addChildren(entry.getValue(), element);
+                Element element = new Element("Node_With_AttributeID_" + String.valueOf(entry.getValue().getAttributeIndex()));
+                Element ifElement;
+                try{
+                    ifElement = new Element("If_Value_In_Interval_"+String.valueOf(Double.valueOf(entry.getKey())*intervalSizes[root.getAttributeIndex()])+"_to_"+String.valueOf((1+Double.valueOf(entry.getKey()))*intervalSizes[root.getAttributeIndex()]));
+                } catch (NumberFormatException e){
+                    ifElement = new Element("If_Value_In_Interval_"+entry.getKey());
+                }
+                jdomRoot.addContent(ifElement);
+                ifElement.addContent(element);
+                addXmlChildren(entry.getValue(), ifElement);
             } else {
-                Element element = new Element("null");
+                Element element = new Element("Leaf_Node_Class_" + entry.getKey());
+                jdomRoot.removeContent();
                 jdomRoot.addContent(element);
             }
 
         }
     }
-    */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
