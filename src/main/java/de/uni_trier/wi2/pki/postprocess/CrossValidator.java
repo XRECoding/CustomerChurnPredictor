@@ -2,13 +2,10 @@ package de.uni_trier.wi2.pki.postprocess;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import de.uni_trier.wi2.pki.util.ID3Utils;
 
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,34 +27,34 @@ public class CrossValidator {
      */
     public static DecisionTreeNode performCrossValidation(List<CSVAttribute[]> dataset, int labelAttribute, BiFunction<List<CSVAttribute[]>, Integer, DecisionTreeNode> trainFunction, int numFolds) {
         int range = dataset.size() / numFolds;                  // calculate the size of one fold
-
         double[] accuracyArray = new double[numFolds];
 
         for (int i = 0; i < numFolds; i++) {
             int startIndex = range * i;                         
             int endIndex = range * (i+1);
             if (i == numFolds-1) endIndex = dataset.size();
-            double sampleSize = endIndex-startIndex;           // used to calculate accuracy later on
-
-            List<CSVAttribute[]> trainingData = Stream.concat(dataset.subList(0, startIndex).stream(), dataset.subList(endIndex, dataset.size()).stream()).collect(Collectors.toList());
-
+            
+            List<CSVAttribute[]> trainingData = dataset.subList(0, startIndex);             // Create left sublist
+            trainingData.addAll(dataset.subList(endIndex, dataset.size()));                 // Add right sublist to left sublist
             DecisionTreeNode root = trainFunction.apply(trainingData, labelAttribute);
 
 
             LinkedList<String> resultList = new LinkedList<>();
-            for (CSVAttribute[] entry : dataset.subList(startIndex, endIndex)){
+            for (CSVAttribute[] entry : dataset.subList(startIndex, endIndex)) {
                 resultList.add(consultTree(root, entry));
             }
-
-
+            
+            int iterator = startIndex;
             double correctClassification = 0;
             for (String result : resultList) {
-                if (result.equals(dataset.get(startIndex)[labelAttribute].getCategory().toString())){
+                if (result.equals(dataset.get(iterator)[labelAttribute].getCategory().toString())) {
                     correctClassification++;
                 }
-                startIndex++;
+                iterator++;
             }
 
+
+            double sampleSize = endIndex-startIndex;           // used to calculate accuracy later on
             double accuracy = correctClassification / sampleSize;
             accuracyArray[i] = accuracy;
         }
@@ -67,6 +64,7 @@ public class CrossValidator {
         
         return null;
     }
+
 
     public static String consultTree(DecisionTreeNode node, CSVAttribute[] array) {
         int attributeID = node.getAttributeIndex();
