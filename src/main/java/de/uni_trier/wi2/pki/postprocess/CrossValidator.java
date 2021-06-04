@@ -68,14 +68,11 @@ public class CrossValidator {
         return null;
     }
 
-    public static String consultTree(DecisionTreeNode node, CSVAttribute[] array){
+    public static String consultTree(DecisionTreeNode node, CSVAttribute[] array) {
         int attributeID = node.getAttributeIndex();
         DecisionTreeNode child = node.getSplits().get(array[attributeID].getCategory().toString());
 
-        if (child == null){
-            return node.getSplits().entrySet().iterator().next().getKey();
-        } else {
-            return consultTree(child, array);
-        }
+        if (child != null) return consultTree(child, array);
+        return node.getSplits().entrySet().iterator().next().getKey();
     }
 }
