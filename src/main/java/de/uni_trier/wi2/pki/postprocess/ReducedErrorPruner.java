@@ -24,4 +24,11 @@ public class ReducedErrorPruner {
 
     }
 
+    public static void consultTree(DecisionTreeNode node) {
+        if (node == null) {System.out.println("Hello"); return;}
+
+        for (DecisionTreeNode curNode : node.getSplits().values()) 
+            consultTree(curNode);
+    }
+
 }
