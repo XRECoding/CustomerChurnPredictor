@@ -3,6 +3,7 @@ package de.uni_trier.wi2.pki.postprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.Collection;
+import java.util.Map;
 
 @SuppressWarnings("rawtypes")
 
@@ -18,8 +19,14 @@ public class ReducedErrorPruner {
      * @param validationExamples  the examples to validate the pruning with.
      * @param labelAttributeId    The label attribute.
      */
-    public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
+    public static void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) { // TODO should not be static
 
     }
 
+    public static void consultTree(DecisionTreeNode node) {
+        if (node == null) {System.out.println("Hello"); return;}
+
+        for (DecisionTreeNode curNode : node.getSplits().values()) 
+            consultTree(curNode);
+    }
 }
