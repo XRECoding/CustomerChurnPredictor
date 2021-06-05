@@ -18,7 +18,9 @@ public class ReducedErrorPruner {
      * @param validationExamples  the examples to validate the pruning with.
      * @param labelAttributeId    The label attribute.
      */
-    public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
+    public static void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
+        double treeAccuracy = CrossValidator.calculateAccuracy(trainedDecisionTree, validationExamples, labelAttributeId);
+
 
     }
 
