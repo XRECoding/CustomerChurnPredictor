@@ -4,6 +4,7 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -37,30 +38,26 @@ public class CrossValidator {
             DecisionTreeNode root = trainFunction.apply(trainingData, labelAttribute);
 
 
-            LinkedList<String> resultList = new LinkedList<>();
-            for (CSVAttribute[] entry : dataset.subList(startIndex, endIndex)) {
-                resultList.add(consultTree(root, entry));
-            }
-            
-            int iterator = startIndex;
-            double correctClassification = 0;
-            for (String result : resultList) {
-                if (result.equals(dataset.get(iterator)[labelAttribute].getCategory().toString())) {
-                    correctClassification++;
-                }
-                iterator++;
-            }
+            accuracyArray[i] = calculateAccuracy(root, dataset.subList(startIndex, endIndex), labelAttribute);
 
-
-            double sampleSize = endIndex-startIndex;           // used to calculate accuracy later on
-            double accuracy = correctClassification / sampleSize;
-            accuracyArray[i] = accuracy;
         }
 
         double finalAccuracy = Arrays.stream(accuracyArray).average().orElse(Double.NaN);
         System.out.println("The learned DecisionTree has an accuracy of " +  finalAccuracy);
-        
+
         return null;
+    }
+
+    public static double calculateAccuracy(DecisionTreeNode root, Collection<CSVAttribute[]> validationExamples, int labelAttributeId){
+        double correctClassification = 0;
+
+        for (CSVAttribute[] array : validationExamples){
+            if (array[labelAttributeId].getCategory().toString().equals(CrossValidator.consultTree(root, array))){
+                correctClassification++;
+            }
+        }
+
+        return correctClassification / validationExamples.size();
     }
 
 

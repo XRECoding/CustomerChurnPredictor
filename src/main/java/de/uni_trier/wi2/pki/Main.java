@@ -3,6 +3,7 @@ package de.uni_trier.wi2.pki;
 import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.postprocess.CrossValidator;
+import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import de.uni_trier.wi2.pki.util.ID3Utils;
@@ -34,6 +35,7 @@ public class Main {
 
             // performing cross validation
             CrossValidator.performCrossValidation(newList, 10, ID3Utils::createTree,5);
+
 
         } catch (IOException e) {
             System.out.println(e.getStackTrace());
