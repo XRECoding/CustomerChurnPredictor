@@ -3,6 +3,8 @@ package de.uni_trier.wi2.pki.postprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("rawtypes")
 
@@ -19,16 +21,37 @@ public class ReducedErrorPruner {
      * @param labelAttributeId    The label attribute.
      */
     public static void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
+        List<String> keys = validationExamples.stream().map(x -> x[labelAttributeId].getCategory().toString())
+                                              .distinct().collect(Collectors.toList());
+
         double treeAccuracy = CrossValidator.calculateAccuracy(trainedDecisionTree, validationExamples, labelAttributeId);
 
 
     }
 
-    public static void consultTree(DecisionTreeNode node) {
-        if (node == null) {System.out.println("Hello"); return;}
+    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> keys, double acc) {
+        if (node == null) return true;
 
-        for (DecisionTreeNode curNode : node.getSplits().values()) 
-            consultTree(curNode);
+        boolean isValidForPruning = true;
+        for (DecisionTreeNode curNode : node.getSplits().values())
+            if (!consultTree(root, curNode, examples, keys, acc))
+                isValidForPruning = false;
+        
+        if (!isValidForPruning) return false;
+
+        for (String key : keys) {
+            int indexOfNode = node.getAttributeIndex();
+            DecisionTreeNode newNode = new DecisionTreeNode(indexOfNode);
+    
+            newNode.getSplits().put(key, null);
+
+            node.getParent().getSplits().put(IndexOfNode, newNode);
+        }
+    }
+
+    public  static List<String> getDistinct(List<CSVAttribute[]> examples, int index) {
+        return examples.stream().filter(x -> x[index] != null).map(x -> x[index].getCategory().toString())
+            .distinct().collect(Collectors.toList());
     }
 
 }
