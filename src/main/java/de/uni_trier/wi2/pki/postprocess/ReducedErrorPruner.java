@@ -29,36 +29,35 @@ public class ReducedErrorPruner {
                                 .distinct().collect(Collectors.toList());
 
         double treeAccuracy = CrossValidator.calculateAccuracy(trainedDecisionTree, validationExamples, labelAttributeId);
-        System.out.println(treeAccuracy);
-        consultTree(trainedDecisionTree, trainedDecisionTree, validationExamples, keys, treeAccuracy);
+        consultTree(trainedDecisionTree, trainedDecisionTree, validationExamples, keys, treeAccuracy, labelAttributeId);
     }
 
-    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> keys, double acc) {
-        if (node == null) return true;
+    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> keys, double acc, int labelAttributeId) {
+        if (node == null) return true;                                                              // Anker
 
         boolean isValidForPruning = true;
-        for (DecisionTreeNode curNode : node.getSplits().values())
-            if (!consultTree(root, curNode, examples, keys, acc))
-                isValidForPruning = false;
+        for (DecisionTreeNode curNode : node.getSplits().values())                                  // Geher alle Zweige entlang
+            if (!consultTree(root, curNode, examples, keys, acc, labelAttributeId))                 // Falls die unteren Zweige nicht kombiniert werden können
+                isValidForPruning = false;                                                          // Dann soll auch nicht der obere Zweig kombiniert werden
         
-        if (!isValidForPruning) return false;
+        if (!isValidForPruning) return false;                                                       // Gehe die Rekursion zum momentanen Zweig nach oben
 
-        String posi = null;
-        Set<Entry<String, DecisionTreeNode>> parentMap = node.getParent().getSplits().entrySet();
-        for (Map.Entry<String, DecisionTreeNode> curNode : parentMap) 
-            if (curNode.getValue() == node) posi = curNode.getKey();
+        String posi = null;                                                                         // Suche die Refernz zum mometanen Knoten "node"
+        Set<Entry<String, DecisionTreeNode>> parentMap = node.getParent().getSplits().entrySet();   //...
+        for (Map.Entry<String, DecisionTreeNode> curNode : parentMap)                               //...
+            if (curNode.getValue() == node) posi = curNode.getKey();                                //...
 
-            
-        for (String key : keys) {
-            DecisionTreeNode newNode = clone(node).getSplits().put(key, null);
-            node.getParent().getSplits().put(posi, newNode);
 
-            if (acc > CrossValidator.calculateAccuracy(root, examples, 10)) { 
-                node.getParent().getSplits().put(posi, node);
-                return false; 
+        for (String key : keys) {                                                                   // Versuche die Knoten zu kombinieren in dem wir jede Möglichkeit ausprobieren
+            DecisionTreeNode newNode = clone(node).getSplits().put(key, null);                      // Erstelle einen Klon vom momentanen Knoten
+            node.getParent().getSplits().put(posi, newNode);                                        // Setze den Klon als neue Verzweigung
+
+            if (acc > CrossValidator.calculateAccuracy(root, examples, labelAttributeId)) {         // Falls die neue Verzeiung genau so gut ist wie die alte, dann lassen wir sie betsehen
+                node.getParent().getSplits().put(posi, node);                                       // Falls nicht, dann machen wir es rückgängig 
+                return false;                                                                       // Und sagen der Rekursion zur momentanen Verzeigung das wir oben nicht kombinieren können. 
             }
         }
-        return true;
+        return true;                                                                                // Gebe zurück das wir erfolgreich kombiniert haben und gegebenen falls oben weiter kombinieren können.
     }
 
 
