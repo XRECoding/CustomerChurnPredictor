@@ -1,13 +1,14 @@
 package de.uni_trier.wi2.pki;
 
 import de.uni_trier.wi2.pki.io.CSVReader;
+import de.uni_trier.wi2.pki.io.XMLWriter;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.postprocess.CrossValidator;
 import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+import de.uni_trier.wi2.pki.util.EntropyUtils;
 import de.uni_trier.wi2.pki.util.ID3Utils;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -27,14 +28,16 @@ public class Main {
             // categorizing input data into CSVAttributes
             List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
 
-            // Create Tree
-            DecisionTreeNode root =  ID3Utils.createTree(newList, 10);
+            // create tree via CrossValidation
+            DecisionTreeNode root = CrossValidator.performCrossValidation(newList, 10, ID3Utils::createTree,5);
 
-            // printing the resulting decision tree
-            ID3Utils.printTree(root);
+            // writing the resulting decision tree into xml
+            XMLWriter.writeXML("D:\\Dokumente\\ZZZ.xml", root);
 
-            // performing cross validation
-            CrossValidator.performCrossValidation(newList, 10, ID3Utils::createTree,5);
+            // prune the tree
+            ReducedErrorPruner reducedErrorPruner = new ReducedErrorPruner();
+            reducedErrorPruner.prune(root, newList, 10);
+
 
 
         } catch (IOException e) {
