@@ -16,7 +16,7 @@ import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
  * Prunes a trained decision tree in a post-pruning way.
  */
 public class ReducedErrorPruner {
-
+    static double acc = 0.0;
     /**
      * Prunes the given decision tree in-place.
      *
@@ -27,17 +27,17 @@ public class ReducedErrorPruner {
     public static void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
         List<String> keys = validationExamples.stream().map(x -> x[labelAttributeId].getCategory().toString())
                                 .distinct().collect(Collectors.toList());
-
-        double treeAccuracy = CrossValidator.calculateAccuracy(trainedDecisionTree, validationExamples, labelAttributeId);
-        consultTree(trainedDecisionTree, trainedDecisionTree, validationExamples, keys, treeAccuracy, labelAttributeId);
+         
+        acc = CrossValidator.calculateAccuracy(trainedDecisionTree, validationExamples, labelAttributeId);
+        consultTree(trainedDecisionTree, trainedDecisionTree, validationExamples, keys, labelAttributeId);
     }
 
-    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> keys, double acc, int labelAttributeId) {
+    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> keys, int labelAttributeId) {
         if (node == null) return true;                                                              // Anker
 
         boolean isValidForPruning = true;
         for (DecisionTreeNode curNode : node.getSplits().values())                                  // Geher alle Zweige entlang
-            if (!consultTree(root, curNode, examples, keys, acc, labelAttributeId))                 // Falls die unteren Zweige nicht kombiniert werden können
+            if (!consultTree(root, curNode, examples, keys, labelAttributeId))                      // Falls die unteren Zweige nicht kombiniert werden können
                 isValidForPruning = false;                                                          // Dann soll auch nicht der obere Zweig kombiniert werden
         
         if (!isValidForPruning) return false;                                                       // Gehe die Rekursion zum momentanen Zweig nach oben
@@ -48,23 +48,32 @@ public class ReducedErrorPruner {
             if (curNode.getValue() == node) posi = curNode.getKey();                                //...
 
 
+        DecisionTreeNode bestChange = null;
         for (String key : keys) {                                                                   // Versuche die Knoten zu kombinieren in dem wir jede Möglichkeit ausprobieren
-            DecisionTreeNode newNode = clone(node).getSplits().put(key, null);                      // Erstelle einen Klon vom momentanen Knoten
+            DecisionTreeNode newNode = clone(node, key);                                            // Erstelle einen Klon vom momentanen Knoten
             node.getParent().getSplits().put(posi, newNode);                                        // Setze den Klon als neue Verzweigung
 
-            if (acc > CrossValidator.calculateAccuracy(root, examples, labelAttributeId)) {         // Falls die neue Verzeiung genau so gut ist wie die alte, dann lassen wir sie betsehen
-                node.getParent().getSplits().put(posi, node);                                       // Falls nicht, dann machen wir es rückgängig 
-                return false;                                                                       // Und sagen der Rekursion zur momentanen Verzeigung das wir oben nicht kombinieren können. 
+            double newAcc = CrossValidator.calculateAccuracy(root, examples, labelAttributeId);
+
+            if (newAcc >= acc) {                                                                    // Falls die neue acc nicht schlechter als die alte ist
+                acc = newAcc;
+                bestChange = newNode;                                                                    
             }
+            node.getParent().getSplits().put(posi, node);                                           // setze den Baum wieder auf den alten standt.
         }
-        return true;                                                                                // Gebe zurück das wir erfolgreich kombiniert haben und gegebenen falls oben weiter kombinieren können.
+
+        if (bestChange != null) {                                                                    // Falls wir einen guten Change gefunden haben dann übernehmen wir ihn.
+            node.getParent().getSplits().put(posi, bestChange);
+            return true;
+        }
+        return false;                                                                                // Gebe zurück das wir erfolgreich kombiniert haben und
     }
 
 
-    public static DecisionTreeNode clone(DecisionTreeNode node)  {
+    public static DecisionTreeNode clone(DecisionTreeNode node, String key)  {
         DecisionTreeNode clone = new DecisionTreeNode(node.getAttributeIndex());
         clone.setParent(node.getParent());
-        clone.setSplits(node.getSplits()); 
+        clone.getSplits().put(key, null);
         return clone;
     }
 }
