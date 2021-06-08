@@ -47,7 +47,7 @@ public class XMLWriter {
     }
 
     /**
-     * Serialize decision tree to specified path.
+     * Builds a jdom tree based on the decision tree.
      *
      * @param root         the subtree to serialize.
      * @param jdomRoot     the subtree equivalent jdom Element.
