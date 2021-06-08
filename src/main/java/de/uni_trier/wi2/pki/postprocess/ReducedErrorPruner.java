@@ -1,18 +1,14 @@
 package de.uni_trier.wi2.pki.postprocess;
 
-import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
-import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import de.uni_trier.wi2.pki.util.EntropyUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
+import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
 @SuppressWarnings("rawtypes")
 
@@ -48,16 +44,16 @@ public class ReducedErrorPruner {
         if (!isValidForPruning) return false;
 
         String posi = null;
-        for (Map.Entry<String, DecisionTreeNode> curNode: node.getParent().getSplits().entrySet()) {
+        Set<Entry<String, DecisionTreeNode>> parentMap = node.getParent().getSplits().entrySet();
+        for (Map.Entry<String, DecisionTreeNode> curNode : parentMap) 
             if (curNode.getValue() == node) posi = curNode.getKey();
-        }
 
+            
         for (String key : keys) {
             DecisionTreeNode newNode = clone(node).getSplits().put(key, null);
             node.getParent().getSplits().put(posi, newNode);
 
-            Double newAcc = CrossValidator.calculateAccuracy(root, examples, 10);
-            if (newAcc < acc) { 
+            if (acc > CrossValidator.calculateAccuracy(root, examples, 10)) { 
                 node.getParent().getSplits().put(posi, node);
                 return false; 
             }
