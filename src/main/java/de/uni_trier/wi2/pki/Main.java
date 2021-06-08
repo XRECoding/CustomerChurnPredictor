@@ -7,7 +7,6 @@ import de.uni_trier.wi2.pki.postprocess.CrossValidator;
 import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import de.uni_trier.wi2.pki.util.EntropyUtils;
 import de.uni_trier.wi2.pki.util.ID3Utils;
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +38,6 @@ public class Main {
             reducedErrorPruner.prune(root, newList, 10);
 
 
-
         } catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
@@ -54,4 +52,5 @@ public class Main {
         System.out.println(node.getAttributeIndex());
         DFS(node.getSplits().entrySet().iterator().next().getValue());
     }
+
 }

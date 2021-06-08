@@ -37,7 +37,7 @@ public class EntropyUtils {
 
         Double r = HE(map.get(labelIndex).values().stream().map(x -> x.entrySet()           // Stream over the map with labelindex
             .iterator().next().getValue().intValue()).collect(Collectors.toList()));        // Compute H(E)
-            
+
         return map.entrySet().stream().filter(x -> (x.getKey() != labelIndex))              // Stream over map and every bucket
             .mapToDouble(x -> r - x.getValue().entrySet().stream().mapToDouble(y ->         // Compute H(Ei) and R(A) for each bucket
             H(y.getValue(), matrix.size())).sum()).boxed().collect(Collectors.toList());    // return a List with the entropy
