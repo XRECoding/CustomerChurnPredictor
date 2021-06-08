@@ -28,4 +28,8 @@ public class DecisionTreeNode {                         // Class for representin
     public HashMap<String, DecisionTreeNode> getSplits(){
         return splits;
     }
+
+    public void setSplits(HashMap<String, DecisionTreeNode> map) {
+        splits = map;
+    }
 }
