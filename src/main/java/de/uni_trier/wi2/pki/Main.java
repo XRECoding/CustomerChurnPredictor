@@ -30,9 +30,6 @@ public class Main {
             // Create Tree
             DecisionTreeNode root =  ID3Utils.createTree(newList, 10);
 
-            // printing the resulting decision tree
-            ID3Utils.printTree(root);
-
             // performing cross validation
             CrossValidator.performCrossValidation(newList, 10, ID3Utils::createTree,5);
 

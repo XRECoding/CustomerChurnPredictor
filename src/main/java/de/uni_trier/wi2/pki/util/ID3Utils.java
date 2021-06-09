@@ -1,11 +1,11 @@
 package de.uni_trier.wi2.pki.util;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
 import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
+import javax.xml.parsers.ParserConfigurationException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
