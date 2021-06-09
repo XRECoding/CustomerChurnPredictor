@@ -24,6 +24,7 @@ public class ReducedErrorPruner {
      * @param validationExamples  the examples to validate the pruning with.
      * @param labelAttributeId    The label attribute.
      */
+
     public static void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
         List<String> keys = validationExamples.stream().map(x -> x[labelAttributeId].getCategory().toString())
                                 .distinct().collect(Collectors.toList());
@@ -41,6 +42,7 @@ public class ReducedErrorPruner {
                 isValidForPruning = false;                                                          // dann soll auch nicht der obere Zweig kombiniert werden
         
         if (!isValidForPruning) return false;                                                       // Gehe die Rekursion zum momentanen Zweig nach oben
+
 
         String posi = null;                                                                         // Suche die Refernz zum momentanen Knoten "node"
         Set<Entry<String, DecisionTreeNode>> parentMap = node.getParent().getSplits().entrySet();   //...
@@ -70,6 +72,7 @@ public class ReducedErrorPruner {
     }
 
 
+
     public static DecisionTreeNode clone(DecisionTreeNode node, String key)  {
         DecisionTreeNode clone = new DecisionTreeNode(node.getAttributeIndex());
         clone.setParent(node.getParent());
@@ -77,3 +80,4 @@ public class ReducedErrorPruner {
         return clone;
     }
 }
+

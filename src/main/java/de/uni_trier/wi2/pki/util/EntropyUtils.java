@@ -7,19 +7,27 @@ import java.util.stream.Collectors;
 @SuppressWarnings("rawtypes")
 
 public class EntropyUtils {
+
+    /**
+     * Create the decision tree given the example and the index of the label attribute.
+     *
+     * @param matrix        The examples to calculate the information gain with. This is a list of arrays.
+     * @param labelIndex    The index of the label attribute.
+     * @return A list with the information gain for each attribute.
+     */
     public static List<Double> calcInformationGain(List<CSVAttribute[]> matrix, int labelIndex) { 
-        Map<Integer, Map<String, Map<String, Integer>>> map = new HashMap<>();              // Create Map with refrences
-        for (int i = 0; i < matrix.get(0).length; i++) map.put(i, new HashMap<>());         // Set refreces for all Attributes
+        Map<Integer, Map<String, Map<String, Integer>>> map = new HashMap<>();              // Create Map with reference
+        for (int i = 0; i < matrix.get(0).length; i++) map.put(i, new HashMap<>());         // Initialize for all Attributes
 
 
         matrix.stream().forEach(array -> {                                                  // Stream over matrix to fill map
             for (int i = 0; i < array.length; i++) {                                        // Iterate over each entry
-                String bucket = array[i].getCategory().toString();                          // Create refrence with the category    ~> Interval
-                String key = array[labelIndex].getCategory().toString();                    // Create refrence with the labelindex  ~> 1/0
+                String bucket = array[i].getCategory().toString();                          // Create reference with the category    ~> Interval
+                String key = array[labelIndex].getCategory().toString();                    // Create reference with the labelindex  ~> 1/0
 
-                if (map.get(i).get(bucket) == null)                                         // Create refrence if there is none
+                if (map.get(i).get(bucket) == null)                                         // Create reference if there is none
                     map.get(i).put(bucket, new HashMap<>());                            
-                if (map.get(i).get(bucket).get(key) == null)                                // Create a startpoint if there is none
+                if (map.get(i).get(bucket).get(key) == null)                                // Create a start point if there is none
                     map.get(i).get(bucket).put(key, 1);                                     // Start counting with
                 else
                     map.get(i).get(bucket).put(key, map.get(i).get(bucket).get(key)+1);     // Count all keys (~> 1/0) for each bucket
@@ -29,7 +37,7 @@ public class EntropyUtils {
 
         Double r = HE(map.get(labelIndex).values().stream().map(x -> x.entrySet()           // Stream over the map with labelindex
             .iterator().next().getValue().intValue()).collect(Collectors.toList()));        // Compute H(E)
-            
+
         return map.entrySet().stream().filter(x -> (x.getKey() != labelIndex))              // Stream over map and every bucket
             .mapToDouble(x -> r - x.getValue().entrySet().stream().mapToDouble(y ->         // Compute H(Ei) and R(A) for each bucket
             H(y.getValue(), matrix.size())).sum()).boxed().collect(Collectors.toList());    // return a List with the entropy
@@ -49,6 +57,7 @@ public class EntropyUtils {
         return (count/n) * h;                                                               // return R(A)
     }
 
+    // method to calculate logarithm to the base of 2
     public static double log2(double value) {
         return (Math.log(value) / Math.log(2));                                             // returns the log to the base of 2
     }

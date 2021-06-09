@@ -23,9 +23,9 @@ public class CSVReader {
     
     public static List<String[]> readCsvToArray(String relativePath, String delimiter, boolean ignoreHeader) throws IOException {
         List<String[]> output = new LinkedList<String[]>();
-        FileReader file = new FileReader("src/main/resources/" + relativePath); 
+        FileReader file = new FileReader("src/main/resources/" + relativePath); // subject to change; specification of relativePath needed
 
-        try (BufferedReader bufferedReader = new BufferedReader(file)) {    // subject to change; specification of relativePath needed
+        try (BufferedReader bufferedReader = new BufferedReader(file)) {
             String currentLine;
 
             while ((currentLine = bufferedReader.readLine()) != null)
