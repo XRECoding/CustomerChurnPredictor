@@ -62,7 +62,7 @@ public class ID3Utils {
 
         // <------------------- create branches using the best attribute ------------------->
         DecisionTreeNode parent = new DecisionTreeNode(bestIndex);                                // Create new node with the used attributeID
-        if (moreOptions(visited, labelIndex) && entropyList.get(bestIndex) != 0.0) {                            // TODO
+        if (moreOptions(visited, labelIndex) && entropyList.get(bestIndex) != 0.0) {                            // more attributes to use and data has significant information
             for (Map.Entry<String, List<CSVAttribute[]>> entry : splitData(examples, bestIndex).entrySet()) {   // for every possible category of the attribute
                 DecisionTreeNode child = treeUtils(entry.getValue(), labelIndex, visited.clone());              // create child with recursive call
 
@@ -129,9 +129,16 @@ public class ID3Utils {
         return map;
     }
 
-    public static boolean moreOptions(boolean array[], int index) {
+    /**
+     * Checks if there are more attributes to use in the current branch.
+     *
+     * @param array          The array keeps track which attributes have been used.
+     * @param labelIndex     The index of the label attribute.
+     * @return Returns true if there are more attributes to use.
+     */
+    public static boolean moreOptions(boolean array[], int labelIndex) {
         for (int i = 0; i < array.length; i++)
-            if (i == index) continue;           // TODO is this necesarry? we set array[index] = true in line 46
+            if (i == labelIndex) continue;
             else if (array[i] == false) return true; 
         return false;
     }

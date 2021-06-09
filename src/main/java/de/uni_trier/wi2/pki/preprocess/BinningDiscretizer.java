@@ -26,9 +26,9 @@ public class BinningDiscretizer {
     public static List<CSVAttribute[]> discretize(int numberOfBins, List<CSVAttribute[]> examples, int attributeId) {
         List<CSVAttribute[]> newData = IntStream.range(0, examples.get(0).length)
             .mapToObj(x -> examples.stream().map(y -> y[x]).toArray(CSVAttribute[]::new))
-            .collect(Collectors.toList()); // TODO change position
+            .collect(Collectors.toList());
 
-            
+
         CSVAttribute[] array = newData.get(attributeId);
         CSVAttribute min = array[0];
         CSVAttribute max = array[0];

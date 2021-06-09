@@ -10,11 +10,20 @@ import java.util.stream.IntStream;
 @SuppressWarnings("rawtypes")
 
 public class Categorizer {
-    public static List<CSVAttribute[]> categorize(List<String[]> list){   
+
+    /**
+     * Categorizes the input data into categoric and continously attributes.
+     * Calls BinningDiscretizer.discretize for continously attributes.
+     *
+     * @param list            The input dataset. This is a list of string arrays.
+     * @param numberOfBins    The number of bins to use when discretizing.
+     * @return List of CSVAttribute arrays. Each array is a column from the original data.
+     */
+    public static List<CSVAttribute[]> categorize(List<String[]> list, int numberOfBins){
         // Switch from rows to colummns
         List<List<String>> columns = IntStream.range(0, list.get(0).length)
             .mapToObj(x -> list.stream().map(y -> y[x])
-            .collect(Collectors.toList())).collect(Collectors.toList());    // TODO change position
+            .collect(Collectors.toList())).collect(Collectors.toList());
 
         // Check what is Categoric
         Boolean[] csvBooleans = columns.stream().map(x -> isCategoric(x.stream()
@@ -28,14 +37,19 @@ public class Categorizer {
         // Set Buckets for each continuously attribute
         for (int i = 0; i < list.get(0).length; i++) 
             if (csvAttributes.get(0)[i] instanceof Continuously)
-                BinningDiscretizer.discretize(5, csvAttributes, i);         // Buckets
+                BinningDiscretizer.discretize(numberOfBins, csvAttributes, i);         // Buckets
 
         return csvAttributes;
     }
 
 ////////////////////////// Helper Functions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // checks if the column is categoric
+    /**
+     * Checks if the attribute is categoric.
+     *
+     * @param list     The data of the attribute to check.
+     * @return  Returns a bollean. The boolean is true if the attribute is categoric.
+     */
     public static boolean isCategoric(List<String> list) {
         try {
             Double.parseDouble(list.get(0));

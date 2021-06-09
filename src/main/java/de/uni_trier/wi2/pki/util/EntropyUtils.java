@@ -46,21 +46,37 @@ public class EntropyUtils {
 
 ////////////////////////// Helper Functions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Calculates Entropy
+     *
+     * @param l        List containing the #occurrence per label.
+     * @return Returns the entropy.
+     */
     public static Double HE(List<Integer> l) {
         Double count = Double.valueOf(l.stream().reduce(0, Integer::sum));                  // Get the sum of all attributes
         return l.stream().mapToDouble(x -> -x/count*log2(x/count)).sum();                   // Return H(E) for the labelindex
     }
 
+    /**
+     * Calculates Entropy per interval
+     *
+     * @param map      A map containing the #occurance per label.
+     * @param n        The total entries in this interval.
+     * @return Returns the entropy for the given interval.
+     */
     public static Double H(Map<String, Integer> map, int n) {
         Double count = Double.valueOf(map.values().stream().reduce(0, Integer::sum));       // Get the sum of all attributes
         Double h = map.values().stream().mapToDouble(x -> -x/count*log2(x/count)).sum();    // Compute H(e) for each e e bucket
         return (count/n) * h;                                                               // return R(A)
     }
 
-    // method to calculate logarithm to the base of 2
+    /**
+     * Calculates the logarithm to the base of 2
+     *
+     * @param value      The value to calculate the log2 for.
+     * @return Returns the log2(x).
+     */
     public static double log2(double value) {
-        return (Math.log(value) / Math.log(2));                                             // returns the log to the base of 2
+        return (Math.log(value) / Math.log(2));
     }
 }
-
-// TODO Algorithms is not able to work with "divide by zero". ~> Unsure if the Algorithm knows what to do when multiplying by zero
