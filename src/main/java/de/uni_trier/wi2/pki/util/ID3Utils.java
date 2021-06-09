@@ -1,9 +1,23 @@
 package de.uni_trier.wi2.pki.util;
 
+
 import java.util.*;
 import java.util.stream.Collectors;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
+import javax.xml.parsers.ParserConfigurationException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
+import static de.uni_trier.wi2.pki.Main.intervalSizes;
 
 @SuppressWarnings("rawtypes")
 
@@ -36,6 +50,7 @@ public class ID3Utils {
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);
         int bestIndex = -1;
 
+
         for (int i = 0; i < entropyList.size(); i++) {
             if (visited[i] || i == labelIndex) continue;        // skip if the attribute has been used before or is the label attribute
             if (bestIndex == -1) bestIndex = i;
@@ -57,6 +72,7 @@ public class ID3Utils {
             return parent;
         } 
         parent.getSplits().put(getMajority(examples,labelIndex), null);     // add leaf with majority label
+
         return parent;
     }
 

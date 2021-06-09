@@ -54,4 +54,5 @@ public class Main {
         System.out.println(node.getAttributeIndex());
         DFS(node.getSplits().entrySet().iterator().next().getValue());
     }
+
 }

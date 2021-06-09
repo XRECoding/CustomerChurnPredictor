@@ -4,8 +4,6 @@ import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import org.jdom2.*;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-
-import javax.xml.transform.URIResolver;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -47,7 +45,7 @@ public class XMLWriter {
     }
 
     /**
-     * Serialize decision tree to specified path.
+     * Builds a jdom tree based on the decision tree.
      *
      * @param root         the subtree to serialize.
      * @param jdomRoot     the subtree equivalent jdom Element.
@@ -73,12 +71,11 @@ public class XMLWriter {
                 // <------------------- transform jdom Element into LeafElement ------------------->
                 Element element = new Element("LeafNode");
                 element.setAttribute(new Attribute("class", entry.getKey()));
-                jdomRoot = jdomRoot.getParentElement();
-                jdomRoot.removeContent();           // remove the jdom Element
-                jdomRoot.addContent(element);       // add the LeafElement
+                Element temp = jdomRoot.getParentElement();
+                temp.removeContent();
+                temp.addContent(element);
             }
 
         }
     }
-
 }
