@@ -37,12 +37,12 @@ public class ReducedErrorPruner {
 
         boolean isValidForPruning = true;
         for (DecisionTreeNode curNode : node.getSplits().values())                                  // Geher alle Zweige entlang
-            if (!consultTree(root, curNode, examples, keys, labelAttributeId))                      // Falls die unteren Zweige nicht kombiniert werden können
-                isValidForPruning = false;                                                          // Dann soll auch nicht der obere Zweig kombiniert werden
+            if (!consultTree(root, curNode, examples, keys, labelAttributeId))                      // Falls die unteren Zweige nicht kombiniert werden können,
+                isValidForPruning = false;                                                          // dann soll auch nicht der obere Zweig kombiniert werden
         
         if (!isValidForPruning) return false;                                                       // Gehe die Rekursion zum momentanen Zweig nach oben
 
-        String posi = null;                                                                         // Suche die Refernz zum mometanen Knoten "node"
+        String posi = null;                                                                         // Suche die Refernz zum momentanen Knoten "node"
         Set<Entry<String, DecisionTreeNode>> parentMap = node.getParent().getSplits().entrySet();   //...
         for (Map.Entry<String, DecisionTreeNode> curNode : parentMap)                               //...
             if (curNode.getValue() == node) posi = curNode.getKey();                                //...
@@ -62,11 +62,11 @@ public class ReducedErrorPruner {
             node.getParent().getSplits().put(posi, node);                                           // setze den Baum wieder auf den alten standt.
         }
 
-        if (bestChange != null) {                                                                    // Falls wir einen guten Change gefunden haben dann übernehmen wir ihn.
+        if (bestChange != null) {                                                                   // Falls wir einen guten Change gefunden haben dann übernehmen wir ihn.
             node.getParent().getSplits().put(posi, bestChange);
-            return true;
+            return true;                                                                            // Gebe zurück das wir erfolgreich kombiniert haben
         }
-        return false;                                                                                // Gebe zurück das wir erfolgreich kombiniert haben und
+        return false;                                                                               // Gebe zurück das wir nicht erfolgreich kombiniert haben
     }
 
 
