@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
 import javax.xml.parsers.ParserConfigurationException;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -25,16 +26,15 @@ public class ID3Utils {
      *
      * @param examples   The examples to train with. This is a collection of arrays.
      * @param labelIndex The label of the attribute that should be used as an index.
-     * @return The newNode node of the decision tree
+     * @return The parent node of the decision tree
      */
     public static DecisionTreeNode createTree(List<CSVAttribute[]> examples, int labelIndex) {
-        return treeUtils(examples, labelIndex, 0, new boolean[examples.get(0).length]);
+        return treeUtils(examples, labelIndex, new boolean[examples.get(0).length]);
     }
 
-    public static DecisionTreeNode treeUtils(List<CSVAttribute[]> examples, int labelIndex, int p, boolean visited[]) {
-        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
+    public static DecisionTreeNode treeUtils(List<CSVAttribute[]> examples, int labelIndex, boolean visited[]) {
+        List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);          // calculate gain for all attributes and find best gain
         int bestIndex = -1;                      
-
 
         for (int i = 0; i < entropyList.size(); i++) {
             if (visited[i] || i == labelIndex) continue;
@@ -42,31 +42,22 @@ public class ID3Utils {
             else if (entropyList.get(bestIndex) < entropyList.get(i))      
                 bestIndex = i;                                                        
         }
- 
-
 
         visited[bestIndex] = true;
+        
+        
+        DecisionTreeNode parent = new DecisionTreeNode(bestIndex);                                // Create new node, that has a reference to a position
+        if (moreOptions(visited, labelIndex) && entropyList.get(bestIndex) != 0.0) {
+            for (Map.Entry<String, List<CSVAttribute[]>> entry : splitData(examples, bestIndex).entrySet()) {
+                DecisionTreeNode child = treeUtils(entry.getValue(), labelIndex, visited.clone());
 
-
-        DecisionTreeNode newNode = new DecisionTreeNode(bestIndex);     // Create new node, that has a reference to a position
-        List<String> keys = getDistinct(examples, labelIndex);          // Get all the diffrent unique values on position ~labelIndex
-
-        if (keys.size() == 1 || !moreOptions(visited, labelIndex) || entropyList.get(bestIndex) == 0.0) {                                                 // Prune branche if the rest of the branche is the same.
-            newNode.getSplits().put(getMajority(examples,labelIndex), null);    // The branche is turned into a leef and gets a refrence to its key
-            return newNode;                                                     // Retrun leef node
-        }
-
-
-
-
-        for (Map.Entry<String, List<CSVAttribute[]>> entry : splitData(examples, bestIndex).entrySet()) {
-            DecisionTreeNode child = treeUtils(entry.getValue(), labelIndex, p+1, visited.clone());
-
-            newNode.getSplits().put(entry.getKey(), child);
-            child.setParent(newNode);
-        }
-
-        return newNode;
+                parent.getSplits().put(entry.getKey(), child);
+                child.setParent(parent);
+            }
+            return parent;
+        } 
+        parent.getSplits().put(getMajority(examples,labelIndex), null);
+        return parent;
     }
 
 ////////////////////// Helper Functions //////////////////////////////////////////////////////////////////

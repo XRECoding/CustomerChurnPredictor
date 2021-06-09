@@ -28,7 +28,7 @@ public class Categorizer {
         // Set Buckets for each continuously attribute
         for (int i = 0; i < list.get(0).length; i++) 
             if (csvAttributes.get(0)[i] instanceof Continuously)
-                BinningDiscretizer.discretize(2, csvAttributes, i);         // Buckets
+                BinningDiscretizer.discretize(5, csvAttributes, i);         // Buckets
 
         return csvAttributes;
     }

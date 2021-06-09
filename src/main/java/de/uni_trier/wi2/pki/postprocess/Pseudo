@@ -1,0 +1,24 @@
+public static void consultTree(root, node) {
+    if (node == null) then 
+        return true; fi
+
+    isValidForPruning <- true;
+    for (DecisionTreeNode curNode : node.getSplits().values()) do
+        isValidForPruning <-  consultTree(curNode);
+    od
+
+    if (!isValidForPruning) then return false; fi
+
+    for (bucket e buckets) do
+        IndexOfNode <- node.getAttributeIndex();
+        newNode <- node.clone().getSplits.put(bucket, null)
+        node.getParent().getSplits().put(IndexOfNode, newNode);
+
+        acc = calculateAccuracy(root, examples, labelId);
+        if (acc is worst) then 
+            node.getParent().getSplits().put(IndexOfOldNode, node);
+            return false; 
+        fi;
+    od
+    return true;
+}
