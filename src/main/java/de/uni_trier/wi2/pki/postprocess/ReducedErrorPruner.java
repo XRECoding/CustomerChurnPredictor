@@ -25,7 +25,7 @@ public class ReducedErrorPruner {
      * @param labelAttributeId    The label attribute.
      */
 
-    public static void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
+    public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
         List<String> keys = validationExamples.stream().map(x -> x[labelAttributeId].getCategory().toString())
                                 .distinct().collect(Collectors.toList());
          

@@ -51,7 +51,6 @@ public class CrossValidator {
 
         }
 
-        System.out.println("The learned DecisionTree has an accuracy of " +  bestAccuracy);
         return bestTree;
     }
 

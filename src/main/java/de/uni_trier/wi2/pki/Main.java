@@ -7,9 +7,9 @@ import de.uni_trier.wi2.pki.postprocess.CrossValidator;
 import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
 import de.uni_trier.wi2.pki.preprocess.Categorizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import de.uni_trier.wi2.pki.util.EntropyUtils;
 import de.uni_trier.wi2.pki.util.ID3Utils;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
@@ -28,16 +28,25 @@ public class Main {
             // categorizing input data into CSVAttributes
             List<CSVAttribute[]> newList = Categorizer.categorize(linkedList);
 
+            // splitting data into training data (80%) and test data (20%)
+            List<CSVAttribute[]> trainingData = newList.subList(0, (int) Math.round(newList.size()*0.8));
+            List<CSVAttribute[]> testData = new LinkedList<>(newList.subList((int) Math.round(newList.size()*0.8), newList.size()));
+
             // create tree via CrossValidation
-            DecisionTreeNode root = CrossValidator.performCrossValidation(newList, 10, ID3Utils::createTree,5);
+            DecisionTreeNode root = CrossValidator.performCrossValidation(trainingData, 10, ID3Utils::createTree,5);
+            double finalAccuracy = CrossValidator.calculateAccuracy(root, testData, 10);
+            System.out.println("The learned tree has an accuracy of " + finalAccuracy);
 
             // writing the resulting decision tree into xml
             XMLWriter.writeXML("D:\\Dokumente\\ZZZ.xml", root);
 
             // prune the tree
             ReducedErrorPruner reducedErrorPruner = new ReducedErrorPruner();
-            reducedErrorPruner.prune(root, newList, 10);
+            reducedErrorPruner.prune(root, testData, 10);
 
+            // calculate and print final accuracy
+            finalAccuracy = CrossValidator.calculateAccuracy(root, testData, 10);
+            System.out.println("The pruned tree has an accuracy of " + finalAccuracy);
 
 
         } catch (IOException e) {
