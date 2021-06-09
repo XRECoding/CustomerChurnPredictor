@@ -3,9 +3,6 @@ package de.uni_trier.wi2.pki.postprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.Collection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 

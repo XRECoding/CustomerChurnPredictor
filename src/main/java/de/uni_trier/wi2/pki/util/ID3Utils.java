@@ -3,21 +3,8 @@ package de.uni_trier.wi2.pki.util;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
-import javax.xml.parsers.ParserConfigurationException;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import static de.uni_trier.wi2.pki.Main.intervalSizes;
 
 @SuppressWarnings("rawtypes")
 

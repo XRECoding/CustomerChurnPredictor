@@ -58,16 +58,16 @@ public class EntropyUtils {
     }
 
     /**
-     * Calculates Entropy per interval
+     * Calculates rest Entropy per interval
      *
-     * @param map      A map containing the #occurance per label.
+     * @param map      A map containing the #occurance per label for the given interval.
      * @param n        The total entries in this interval.
-     * @return Returns the entropy for the given interval.
+     * @return Returns the rest entropy for the given interval.
      */
     public static Double H(Map<String, Integer> map, int n) {
         Double count = Double.valueOf(map.values().stream().reduce(0, Integer::sum));       // Get the sum of all attributes
         Double h = map.values().stream().mapToDouble(x -> -x/count*log2(x/count)).sum();    // Compute H(e) for each e e bucket
-        return (count/n) * h;                                                               // return R(A)
+        return (count/n) * h;                                                               // return R(A) per interval
     }
 
     /**
