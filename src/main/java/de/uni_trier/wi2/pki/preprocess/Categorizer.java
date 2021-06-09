@@ -29,15 +29,15 @@ public class Categorizer {
         Boolean[] csvBooleans = columns.stream().map(x -> isCategoric(x.stream()
             .distinct().collect(Collectors.toList()))).toArray(Boolean[]::new);
 
-        // Create every attribute from every row to CSVAttribute
+        // Transform every attribute from every row to CSVAttribute
         List<CSVAttribute[]> csvAttributes = list.stream().map(x -> IntStream.range(0, x.length)
             .mapToObj(y -> (csvBooleans[y])? new Categoric(x[y]) : new Continuously(x[y]))
             .toArray(CSVAttribute[]::new)).collect(Collectors.toList());
 
-        // Set Buckets for each continuously attribute
+        // Discretize each continuously attribute
         for (int i = 0; i < list.get(0).length; i++) 
             if (csvAttributes.get(0)[i] instanceof Continuously)
-                BinningDiscretizer.discretize(numberOfBins, csvAttributes, i);         // Buckets
+                BinningDiscretizer.discretize(numberOfBins, csvAttributes, i);
 
         return csvAttributes;
     }
@@ -47,8 +47,8 @@ public class Categorizer {
     /**
      * Checks if the attribute is categoric.
      *
-     * @param list     The data of the attribute to check.
-     * @return  Returns a bollean. The boolean is true if the attribute is categoric.
+     * @param list     The distinct data values of the attribute to check.
+     * @return  Returns a boolean. The boolean is true if the attribute is categoric.
      */
     public static boolean isCategoric(List<String> list) {
         try {

@@ -21,16 +21,16 @@ public class EntropyUtils {
 
 
         matrix.stream().forEach(array -> {                                                  // Stream over matrix to fill map
-            for (int i = 0; i < array.length; i++) {                                        // Iterate over each entry
+            for (int i = 0; i < array.length; i++) {                                        // Iterate over each entry (row)
                 String bucket = array[i].getCategory().toString();                          // Create reference with the category    ~> Interval
-                String key = array[labelIndex].getCategory().toString();                    // Create reference with the labelindex  ~> 1/0
+                String label = array[labelIndex].getCategory().toString();                  // Create reference with the labelindex  ~> 1/0
 
                 if (map.get(i).get(bucket) == null)                                         // Create reference if there is none
                     map.get(i).put(bucket, new HashMap<>());                            
-                if (map.get(i).get(bucket).get(key) == null)                                // Create a start point if there is none
-                    map.get(i).get(bucket).put(key, 1);                                     // Start counting with
+                if (map.get(i).get(bucket).get(label) == null)                              // Create a start point if there is none
+                    map.get(i).get(bucket).put(label, 1);                                   // Start counting with
                 else
-                    map.get(i).get(bucket).put(key, map.get(i).get(bucket).get(key)+1);     // Count all keys (~> 1/0) for each bucket
+                    map.get(i).get(bucket).put(label, map.get(i).get(bucket).get(label)+1); // Count all labels (~> 1/0) for each bucket
             } 
         });
 

@@ -45,7 +45,6 @@ public class CrossValidator {
                 bestTree = root;                        // save the current tree as the new max and
                 bestAccuracy = currentAccuracy;         // save the current accuracy as the new max
             }
-
         }
 
         return bestTree;

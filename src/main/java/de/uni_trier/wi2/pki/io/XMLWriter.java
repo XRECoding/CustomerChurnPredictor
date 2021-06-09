@@ -75,7 +75,6 @@ public class XMLWriter {
                 temp.removeContent();
                 temp.addContent(element);
             }
-
         }
     }
 }

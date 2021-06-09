@@ -25,19 +25,19 @@ public class ReducedErrorPruner {
      */
 
     public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
-        List<String> keys = validationExamples.stream().map(x -> x[labelAttributeId].getCategory().toString())
+        List<String> labels = validationExamples.stream().map(x -> x[labelAttributeId].getCategory().toString())
                                 .distinct().collect(Collectors.toList());
          
         acc = CrossValidator.calculateAccuracy(trainedDecisionTree, validationExamples, labelAttributeId);
-        consultTree(trainedDecisionTree, trainedDecisionTree, validationExamples, keys, labelAttributeId);
+        consultTree(trainedDecisionTree, trainedDecisionTree, validationExamples, labels, labelAttributeId);
     }
 
-    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> keys, int labelAttributeId) {
+    public static boolean consultTree(DecisionTreeNode root, DecisionTreeNode node, Collection<CSVAttribute[]> examples, List<String> labels, int labelAttributeId) {
         if (node == null) return true;                                                              // Anker
 
         boolean isValidForPruning = true;
         for (DecisionTreeNode curNode : node.getSplits().values())                                  // Geher alle Zweige entlang
-            if (!consultTree(root, curNode, examples, keys, labelAttributeId))                      // Falls die unteren Zweige nicht kombiniert werden können,
+            if (!consultTree(root, curNode, examples, labels, labelAttributeId))                    // Falls die unteren Zweige nicht kombiniert werden können,
                 isValidForPruning = false;                                                          // dann soll auch nicht der obere Zweig kombiniert werden
         
         if (!isValidForPruning) return false;                                                       // Gehe die Rekursion zum momentanen Zweig nach oben
@@ -50,8 +50,8 @@ public class ReducedErrorPruner {
 
 
         DecisionTreeNode bestChange = null;
-        for (String key : keys) {                                                                   // Versuche die Knoten zu kombinieren in dem wir jede Möglichkeit ausprobieren
-            DecisionTreeNode newNode = clone(node, key);                                            // Erstelle einen Klon vom momentanen Knoten
+        for (String label : labels) {                                                               // Versuche die Knoten zu kombinieren in dem wir jede Möglichkeit ausprobieren
+            DecisionTreeNode newNode = clone(node, label);                                          // Erstelle einen Klon vom momentanen Knoten
             node.getParent().getSplits().put(posi, newNode);                                        // Setze den Klon als neue Verzweigung
 
             double newAcc = CrossValidator.calculateAccuracy(root, examples, labelAttributeId);

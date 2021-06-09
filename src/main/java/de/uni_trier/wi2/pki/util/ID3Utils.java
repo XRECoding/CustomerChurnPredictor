@@ -67,18 +67,6 @@ public class ID3Utils {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns all unique values in a list at a given index.
-     *
-     * @param examples      The examples to use. This is a list of arrays.
-     * @param index         The index of the attribute to use.
-     * @return The list containing all unique values.
-     */
-    public  static List<String> getDistinct(List<CSVAttribute[]> examples, int index) {
-        return examples.stream().filter(x -> x[index] != null).map(x -> x[index].getCategory().toString())
-            .distinct().collect(Collectors.toList());
-    }
-
-    /**
      * Returns the majority label of the dataset.
      *
      * @param data      The dataset. This is a list of arrays.
@@ -115,6 +103,20 @@ public class ID3Utils {
             .getCategory().toString()).add(array));
         return map;
     }
+
+
+    /**
+     * Returns all unique values in a list at a given index.
+     *
+     * @param examples      The examples to use. This is a list of arrays.
+     * @param index         The index of the attribute to use.
+     * @return The list containing all unique values.
+     */
+    public  static List<String> getDistinct(List<CSVAttribute[]> examples, int index) {
+        return examples.stream().filter(x -> x[index] != null).map(x -> x[index].getCategory().toString())
+                .distinct().collect(Collectors.toList());
+    }
+
 
     /**
      * Checks if there are more attributes to use in the current branch.
