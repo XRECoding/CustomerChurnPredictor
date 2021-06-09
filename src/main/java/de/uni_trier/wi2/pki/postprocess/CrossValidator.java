@@ -3,6 +3,9 @@ package de.uni_trier.wi2.pki.postprocess;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -24,12 +27,15 @@ public class CrossValidator {
      */
     public static DecisionTreeNode performCrossValidation(List<CSVAttribute[]> dataset, int labelAttribute, BiFunction<List<CSVAttribute[]>, Integer, DecisionTreeNode> trainFunction, int numFolds) {
         int range = dataset.size() / numFolds;                  // calculate the size of one fold
+
         DecisionTreeNode bestTree = null;
         Double bestAccuracy = 0.0;
+
 
         for (int i = 0; i < numFolds; i++) {
             int startIndex = range * i;                         
             int endIndex = range * (i+1);
+
             if (i == numFolds-1) endIndex = dataset.size();         // puts the few leftover elements into the last fold
             
             List<CSVAttribute[]> trainingData = dataset.subList(0, startIndex);             // Create left sublist
@@ -62,12 +68,14 @@ public class CrossValidator {
 
         for (CSVAttribute[] array : validationExamples){        // for every data entry
             if (array[labelAttributeId].getCategory().toString().equals(CrossValidator.consultTree(root, array))){      // compare if the resulting label of the tree is equal to the given label
+
                 correctClassification++;
             }
         }
 
         return correctClassification / validationExamples.size();
     }
+
 
     /**
      * Performs a cross-validation with the specified dataset and the function to train the model.
@@ -82,5 +90,6 @@ public class CrossValidator {
 
         if (child != null) return consultTree(child, array);
         return root.getSplits().entrySet().iterator().next().getKey();
+
     }
 }

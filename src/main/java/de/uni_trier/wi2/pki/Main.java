@@ -38,6 +38,7 @@ public class Main {
             reducedErrorPruner.prune(root, newList, 10);
 
 
+
         } catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
