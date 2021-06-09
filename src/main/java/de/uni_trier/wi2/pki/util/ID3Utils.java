@@ -2,15 +2,12 @@ package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("rawtypes")
 
@@ -33,10 +30,8 @@ public class ID3Utils {
 
         List<Double> entropyList = EntropyUtils.calcInformationGain(examples, labelIndex);  // calculate gain for all attributes and find best gain
 
-        entropyList.forEach(System.out::println);
-        
+ 
 
-        System.out.println();
         int bestIndex = 0;                      
 
         for (int i = 1; i < entropyList.size(); i++) {                  // Iterate thru the entropy set
@@ -48,7 +43,13 @@ public class ID3Utils {
 
         DecisionTreeNode newNode = new DecisionTreeNode(bestIndex);     // Create new node, that has a reference to a position
         List<String> keys = getDistinct(examples, labelIndex);          // Get all the diffrent unique values on position ~labelIndex
-
+        if (entropyList.get(bestIndex) == 0.0) {
+            System.out.print(examples.size());
+            System.out.println(entropyList);
+            System.out.println(" " + getDistinct(examples, labelIndex));
+            examples.stream().forEach(x -> {Stream.of(x).forEach(y -> System.out.print(y.getValue() + " ")); System.out.println();});
+            System.out.println();
+        }
         if (keys.size() == 1) {                                         // Prune branche if the rest of the branche is the same.
             newNode.getSplits().put((keys.iterator().next()), null);    // The branche is turned into a leef and gets a refrence to its key
             return newNode;                                             // Retrun leef node
@@ -84,54 +85,5 @@ public class ID3Utils {
         return examples.stream().filter(x -> !x[index].getCategory().toString().equals(bucket))
                        .collect(Collectors.toList());
     }
-
-    public static void printTree(DecisionTreeNode root) throws ParserConfigurationException {
-        // create and configure outputSteam
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        xmlOutputter.getFormat().setExpandEmptyElements(true);
-
-        // create document and content root
-        Element rootElement = new Element("Attribut"+String.valueOf(root.getAttributeIndex()));
-        Document doc = new Document(rootElement);
-
-        addChildren(root, rootElement);
-//        Element eleA = new Element("A");
-//        rootElement.addContent(eleA);
-//        rootElement.addContent(new Element("B"));
-//        rootElement.addContent(new Element("C"));
-//
-//        eleA.addContent(new Element("A1"));
-//        eleA.addContent(new Element("A2"));
-//        eleA.addContent(new Element("A3"));
-
-
-
-
-
-
-        // output the xml file
-        try{
-            xmlOutputter.output(doc, System.out);
-        }catch (IOException e){
-            System.out.println(e.getStackTrace());
-        }
-    }
-
-    public static void addChildren(DecisionTreeNode root, Element jdomRoot){
-        for (Map.Entry<String, DecisionTreeNode> entry : root.getSplits().entrySet()) {
-            if (entry.getValue() != null){
-                Element element = new Element("Attribut" + String.valueOf(entry.getValue().getAttributeIndex()));
-                jdomRoot.addContent(element);
-                addChildren(entry.getValue(), element);
-            } else {
-                Element element = new Element("null");
-                jdomRoot.addContent(element);
-            }
-
-        }
-    }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 

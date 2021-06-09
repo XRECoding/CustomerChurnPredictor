@@ -42,7 +42,7 @@ public class Main {
 
 
 
-        }catch (IOException e){
+        } catch (IOException e){
             System.out.println(e.getStackTrace());
         }
 
