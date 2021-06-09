@@ -38,11 +38,14 @@ public class Main {
             System.out.println("The learned tree has an accuracy of " + finalAccuracy);
 
             // writing the resulting decision tree into xml
-            XMLWriter.writeXML("D:\\Dokumente\\ZZZ.xml", root);
+            XMLWriter.writeXML("src/main/resources/LearnedDecisionTree.xml", root);
 
             // prune the tree
             ReducedErrorPruner reducedErrorPruner = new ReducedErrorPruner();
             reducedErrorPruner.prune(root, testData, 10);
+
+            // writing the resulting decision tree into xml
+            XMLWriter.writeXML("src/main/resources/PrunedDecisionTree.xml", root);
 
             // calculate and print final accuracy
             finalAccuracy = CrossValidator.calculateAccuracy(root, testData, 10);
@@ -53,15 +56,4 @@ public class Main {
             System.out.println(e.getStackTrace());
         }
     }
-
-    public static void DFS(DecisionTreeNode node) {
-        
-        if (node.getSplits().entrySet().iterator().next().getValue() == null) {
-            System.out.println(node.getSplits().entrySet().iterator().next().getKey());
-            return;
-        }
-        System.out.println(node.getAttributeIndex());
-        DFS(node.getSplits().entrySet().iterator().next().getValue());
-    }
-
 }
