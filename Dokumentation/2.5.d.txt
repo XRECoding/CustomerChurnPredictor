@@ -1,0 +1,17 @@
+Das geschriebene Java Programm ist in der Lage eine höhere Genauigkeit zu erzielen.
+Dies liegt an der Tatsache, dass wir in der Lage sind das Programm an unsere
+Erwartungen genaustens anzupassen. Diese Tatsache bedeutete aber auch ein erheblich höheren
+Arbeits- und Zeitaufwand.
+
+RapidMiner auf der anderen Seite besitzt bereits alle Funktionalitäten die wir zur Generierung
+unseres Modelles brauchen. Hierbei muss man jedoch beachten, dass man sich anfänglich einarbeiten
+musste, sobald man aber das Prinzip von RapidMiner verstanden hat, ist man in der Lage sehr schnell
+und einfache Modelle zu erstellen. Hierbei muss man oft nur wenige Bausteine
+miteinander verbinden, um gute Modelle zu erhalten. Diese Modelle kann man aber teilweise nur schwer
+nach seinen Wünschen anpassen, was zur Folge hat, dass die Modelle nicht immer perfekt sind.
+
+
+Zusammenfassend kann man also Sagen:
+Java bietet hohe Anpassungsfähigkeit und Genauigkeit auf Kosten der Zeit und Aufwand.
+RapidMiner bietet eine sehr schnelle und einfache Generierung von Modellen auf Kosten 
+der Anpassungsfähigkeit und Genauigkeit.
